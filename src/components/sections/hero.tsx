@@ -1,99 +1,105 @@
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
+
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-white py-24 lg:py-32">
-      <div className="container relative z-10">
-        <div className="mx-auto max-w-4xl text-center">
-          <Badge variant="secondary" className="mb-6 px-4 py-2 text-sm font-medium">
-            AI for Property Management
-          </Badge>
-          
-          <h1 className="mb-8 text-5xl font-bold tracking-tight text-gray-900 sm:text-6xl lg:text-7xl">
-            Full-Stack AI Solutions
-            <br />
-            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
-              for Property Management
-            </span>
-          </h1>
-          
-          <p className="mb-10 text-xl text-gray-600 lg:text-2xl leading-relaxed">
-            Outcomes delivered with world-class AI models, intelligent automation, 
-            and enterprise-grade security for your property business.
-          </p>
-          
-          <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <Button size="lg" className="text-lg px-8 py-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-              Book a Demo →
-            </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-2">
-              Build AI →
-            </Button>
-          </div>
+    <section className="hero">
+      <div className="container">
+        <div className="badge">
+          The Procurement Intelligence and Compliance Platform
         </div>
 
-        {/* Feature highlights with Scale-inspired design */}
-        <div className="mt-20 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          <Card className="border-0 bg-gradient-to-br from-gray-50 to-white shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardContent className="p-8">
-              <div className="mb-6 h-16 w-16 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
-                <span className="text-3xl">🤖</span>
-              </div>
-              <h3 className="mb-4 text-xl font-semibold text-gray-900">Fine-Tuning & RLHF</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Adapt best-in-class foundation models to your property data to build sustainable, 
-                successful AI programs for your enterprise.
-              </p>
-            </CardContent>
-          </Card>
+        <h1>
+          Where innovation meets
+          <br />
+          <span>compliance.</span>
+        </h1>
 
-          <Card className="border-0 bg-gradient-to-br from-gray-50 to-white shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardContent className="p-8">
-              <div className="mb-6 h-16 w-16 rounded-xl bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center">
-                <span className="text-3xl">🏗️</span>
-              </div>
-              <h3 className="mb-4 text-xl font-semibold text-gray-900">Foundation Models</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Integrate with leading AI models from open-source to closed-source, 
-                including Google, Meta, Cohere, and more.
-              </p>
-            </CardContent>
-          </Card>
+        <p>
+          Find, win, and deliver government contracts — without the gatekeepers. 
+          The procurement intelligence platform that levels the playing field for challengers and incumbents alike.
+        </p>
 
-          <Card className="border-0 bg-gradient-to-br from-gray-50 to-white shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardContent className="p-8">
-              <div className="mb-6 h-16 w-16 rounded-xl bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
-                <span className="text-3xl">🔒</span>
-              </div>
-              <h3 className="mb-4 text-xl font-semibold text-gray-900">Enterprise Data</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Integrate your enterprise property data into AI models, providing 
-                the base for long-term strategic differentiation.
-              </p>
-            </CardContent>
-          </Card>
+        <div className="hero-buttons">
+          <a href="/book-demo" className="btn btn-primary btn-lg">
+            Book a Demo →
+          </a>
+          <a href="#" className="btn btn-outline btn-lg">
+            See How It Works
+          </a>
         </div>
+      </div>
 
-        {/* Partner logos section */}
-        <div className="mt-20 text-center">
-          <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-8">
-            AI PROVIDERS WE PARTNER WITH:
+      {/* Proof Row */}
+      <div className="proof-row">
+        <div className="container">
+          <p className="proof-label">
+            Trusted by innovators, primes, and government agencies
           </p>
-          <div className="flex justify-center items-center space-x-8 opacity-60">
-            <div className="text-2xl font-bold text-gray-400">OpenAI</div>
-            <div className="text-2xl font-bold text-gray-400">Anthropic</div>
-            <div className="text-2xl font-bold text-gray-400">Google</div>
-            <div className="text-2xl font-bold text-gray-400">Meta</div>
+          <div className="proof-items">
+            <div className="proof-item">SDVOSB</div>
+            <div className="proof-item">8(a)</div>
+            <div className="proof-item">WOSB</div>
+            <div className="proof-item">HUBZone</div>
+            <div className="proof-item">VOSB</div>
+            <div className="proof-item">EDWOSB</div>
+            <div className="proof-item">SBA</div>
+            <div className="proof-item">Primes</div>
+            <div className="proof-item">Startups</div>
+            <div className="proof-item">Fortune 500</div>
+            <div className="proof-item">DoD</div>
+            <div className="proof-item">Federal</div>
           </div>
         </div>
       </div>
 
-      {/* Background decoration */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-blue-100/30 blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-purple-100/30 blur-3xl"></div>
+      {/* How It Works (3 Steps) */}
+      <div className="container">
+        <div className="features-grid">
+          <div className="feature-card">
+            <div className="feature-icon">01</div>
+            <h3>Search & Discover</h3>
+            <p>
+              Real-time intelligence on opportunities and competitors with advanced search filters and AI-powered matching.
+            </p>
+          </div>
+
+          <div className="feature-card">
+            <div className="feature-icon">02</div>
+            <h3>Assemble & Comply</h3>
+            <p>
+              Pre-built templates with compliance baked in that pass first review and reduce submission time by 70%.
+            </p>
+          </div>
+
+          <div className="feature-card">
+            <div className="feature-icon">03</div>
+            <h3>Submit & Compete</h3>
+            <p>
+              Government-ready deliverables without prime control or gatekeepers. Direct access to decision-makers.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Impact Statement */}
+      <div className="quote-section">
+        <div className="container">
+          <div className="quote-container">
+            <blockquote className="quote">
+              The most capable vendor should win — not the one with the most lobbyists.
+            </blockquote>
+            <p className="quote-attribution">
+              — Prop Shop AI Vision Statement
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Background Decorations */}
+      <div className="bg-decoration">
+        <div className="bg-circle"></div>
+        <div className="bg-circle"></div>
+        <div className="bg-circle"></div>
       </div>
     </section>
   )

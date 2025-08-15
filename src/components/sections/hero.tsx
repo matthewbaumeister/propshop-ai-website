@@ -4,6 +4,8 @@ export function Hero() {
   return (
     <section className="hero">
       <div className="container">
+
+        
         <div className="badge">
           The Procurement Intelligence and Compliance Platform
         </div>
@@ -23,7 +25,7 @@ export function Hero() {
           <a href="/book-demo" className="btn btn-primary btn-lg">
             Book a Demo →
           </a>
-          <a href="#" className="btn btn-outline btn-lg">
+          <a href="/how-it-works" className="btn btn-outline btn-lg">
             See How It Works
           </a>
         </div>
@@ -35,19 +37,149 @@ export function Hero() {
           <p className="proof-label">
             Trusted by innovators, primes, and government agencies
           </p>
-          <div className="proof-items">
-            <div className="proof-item">SDVOSB</div>
-            <div className="proof-item">8(a)</div>
-            <div className="proof-item">WOSB</div>
-            <div className="proof-item">HUBZone</div>
-            <div className="proof-item">VOSB</div>
-            <div className="proof-item">EDWOSB</div>
-            <div className="proof-item">SBA</div>
-            <div className="proof-item">Primes</div>
-            <div className="proof-item">Startups</div>
-            <div className="proof-item">Fortune 500</div>
-            <div className="proof-item">DoD</div>
-            <div className="proof-item">Federal</div>
+          <div className="proof-scroll">
+            <div className="proof-items">
+              <div className="proof-item">SDVOSB</div>
+              <div className="proof-item">8(a)</div>
+              <div className="proof-item">WOSB</div>
+              <div className="proof-item">HUBZone</div>
+              <div className="proof-item">VOSB</div>
+              <div className="proof-item">EDWOSB</div>
+              <div className="proof-item">SBA</div>
+              <div className="proof-item">Primes</div>
+              <div className="proof-item">Startups</div>
+              <div className="proof-item">Fortune 500</div>
+              <div className="proof-item">DoD</div>
+              <div className="proof-item">Federal</div>
+              {/* Duplicate items for seamless scrolling */}
+              <div className="proof-item">SDVOSB</div>
+              <div className="proof-item">8(a)</div>
+              <div className="proof-item">WOSB</div>
+              <div className="proof-item">HUBZone</div>
+              <div className="proof-item">VOSB</div>
+              <div className="proof-item">EDWOSB</div>
+              <div className="proof-item">SBA</div>
+              <div className="proof-item">Primes</div>
+              <div className="proof-item">Startups</div>
+              <div className="proof-item">Fortune 500</div>
+              <div className="proof-item">DoD</div>
+              <div className="proof-item">Federal</div>
+              {/* Second duplicate for smoother infinite scroll */}
+              <div className="proof-item">SDVOSB</div>
+              <div className="proof-item">8(a)</div>
+              <div className="proof-item">WOSB</div>
+              <div className="proof-item">HUBZone</div>
+              <div className="proof-item">VOSB</div>
+              <div className="proof-item">EDWOSB</div>
+              <div className="proof-item">SBA</div>
+              <div className="proof-item">Primes</div>
+              <div className="proof-item">Startups</div>
+              <div className="proof-item">Fortune 500</div>
+              <div className="proof-item">DoD</div>
+              <div className="proof-item">Federal</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Government Agencies Row */}
+      <div className="agencies-row">
+        <div className="container">
+          <p className="agencies-label">
+            We&apos;ve worked on proposals supporting:
+          </p>
+          <div className="agencies-scroll">
+            <div className="agencies-items">
+              <div className="agency-item">U.S. Army</div>
+              <div className="agency-item">U.S. Navy</div>
+              <div className="agency-item">U.S. Air Force</div>
+              <div className="agency-item">U.S. Marine Corps</div>
+              <div className="agency-item">U.S. Coast Guard</div>
+              <div className="agency-item">Department of Defense</div>
+              <div className="agency-item">National Security Agency</div>
+              <div className="agency-item">Central Intelligence Agency</div>
+              <div className="agency-item">National Geospatial-Intelligence Agency</div>
+              <div className="agency-item">Defense Intelligence Agency</div>
+              <div className="agency-item">Department of Homeland Security</div>
+              <div className="agency-item">Federal Bureau of Investigation</div>
+              <div className="agency-item">Department of Energy</div>
+              <div className="agency-item">Department of Veterans Affairs</div>
+              <div className="agency-item">Department of Health & Human Services</div>
+              <div className="agency-item">Department of Transportation</div>
+              <div className="agency-item">Department of Commerce</div>
+              <div className="agency-item">Department of Interior</div>
+              <div className="agency-item">Department of Agriculture</div>
+              <div className="agency-item">Department of Education</div>
+              <div className="agency-item">Department of Labor</div>
+              <div className="agency-item">Department of Housing & Urban Development</div>
+              <div className="agency-item">Department of Justice</div>
+              <div className="agency-item">Department of State</div>
+              <div className="agency-item">Department of Treasury</div>
+              <div className="agency-item">General Services Administration</div>
+              <div className="agency-item">National Aeronautics & Space Administration</div>
+              <div className="agency-item">Environmental Protection Agency</div>
+              <div className="agency-item">Small Business Administration</div>
+              {/* Duplicate items for seamless scrolling */}
+              <div className="agency-item">U.S. Army</div>
+              <div className="agency-item">U.S. Navy</div>
+              <div className="agency-item">U.S. Air Force</div>
+              <div className="agency-item">U.S. Marine Corps</div>
+              <div className="agency-item">U.S. Coast Guard</div>
+              <div className="agency-item">Department of Defense</div>
+              <div className="agency-item">National Security Agency</div>
+              <div className="agency-item">Central Intelligence Agency</div>
+              <div className="agency-item">National Geospatial-Intelligence Agency</div>
+              <div className="agency-item">Defense Intelligence Agency</div>
+              <div className="agency-item">Department of Homeland Security</div>
+              <div className="agency-item">Federal Bureau of Investigation</div>
+              <div className="agency-item">Department of Energy</div>
+              <div className="agency-item">Department of Veterans Affairs</div>
+              <div className="agency-item">Department of Health & Human Services</div>
+              <div className="agency-item">Department of Transportation</div>
+              <div className="agency-item">Department of Commerce</div>
+              <div className="agency-item">Department of Interior</div>
+              <div className="agency-item">Department of Agriculture</div>
+              <div className="agency-item">Department of Education</div>
+              <div className="agency-item">Department of Labor</div>
+              <div className="agency-item">Department of Housing & Urban Development</div>
+              <div className="agency-item">Department of Justice</div>
+              <div className="agency-item">Department of State</div>
+              <div className="agency-item">Department of Treasury</div>
+              <div className="agency-item">General Services Administration</div>
+              <div className="agency-item">National Aeronautics & Space Administration</div>
+              <div className="agency-item">Environmental Protection Agency</div>
+              <div className="agency-item">Small Business Administration</div>
+              {/* Second duplicate for smoother infinite scroll */}
+              <div className="agency-item">U.S. Army</div>
+              <div className="agency-item">U.S. Navy</div>
+              <div className="agency-item">U.S. Air Force</div>
+              <div className="agency-item">U.S. Marine Corps</div>
+              <div className="agency-item">U.S. Coast Guard</div>
+              <div className="agency-item">Department of Defense</div>
+              <div className="agency-item">National Security Agency</div>
+              <div className="agency-item">Central Intelligence Agency</div>
+              <div className="agency-item">National Geospatial-Intelligence Agency</div>
+              <div className="agency-item">Defense Intelligence Agency</div>
+              <div className="agency-item">Department of Homeland Security</div>
+              <div className="agency-item">Federal Bureau of Investigation</div>
+              <div className="agency-item">Department of Energy</div>
+              <div className="agency-item">Department of Veterans Affairs</div>
+              <div className="agency-item">Department of Health & Human Services</div>
+              <div className="agency-item">Department of Transportation</div>
+              <div className="agency-item">Department of Commerce</div>
+              <div className="agency-item">Department of Interior</div>
+              <div className="agency-item">Department of Agriculture</div>
+              <div className="agency-item">Department of Education</div>
+              <div className="agency-item">Department of Labor</div>
+              <div className="agency-item">Department of Housing & Urban Development</div>
+              <div className="agency-item">Department of Justice</div>
+              <div className="agency-item">Department of State</div>
+              <div className="agency-item">Department of Treasury</div>
+              <div className="agency-item">General Services Administration</div>
+              <div className="agency-item">National Aeronautics & Space Administration</div>
+              <div className="agency-item">Environmental Protection Agency</div>
+              <div className="agency-item">Small Business Administration</div>
+            </div>
           </div>
         </div>
       </div>
@@ -86,10 +218,10 @@ export function Hero() {
         <div className="container">
           <div className="quote-container">
             <blockquote className="quote">
-              The most capable vendor should win — not the one with the most lobbyists.
+              A world where the government buys based on capability, not connections.
             </blockquote>
             <p className="quote-attribution">
-              — Prop Shop AI Vision Statement
+              Prop Shop AI Vision Statement
             </p>
           </div>
         </div>

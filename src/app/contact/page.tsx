@@ -1,259 +1,512 @@
 'use client'
 
-import { useState } from 'react'
-import { Header } from '@/components/layout/header'
+import { useState, useEffect } from 'react'
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    company: '',
-    phone: '',
-    message: '',
-    budget: '',
-    timeline: ''
-  })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
+  // Force cache refresh
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (!sessionStorage.getItem('contactPageRefreshed')) {
+        sessionStorage.setItem('contactPageRefreshed', 'true')
+        window.location.reload()
+      }
+    }
+  }, [])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
     setSubmitStatus('idle')
-
+    
+    const formData = new FormData(e.currentTarget)
+    const data = {
+      name: formData.get('name') as string,
+      email: formData.get('email') as string,
+      company: formData.get('company') as string,
+      phone: formData.get('phone') as string,
+      timeline: formData.get('timeline') as string,
+      message: formData.get('message') as string
+    }
+    
     try {
-      // For now, we'll use a simple mailto link
-      // In production, you'd want to use a proper email service like SendGrid, Resend, or Supabase Edge Functions
-      const mailtoLink = `mailto:info@prop-shop.ai?subject=Contact from ${encodeURIComponent(formData.name)} - ${encodeURIComponent(formData.company)}&body=${encodeURIComponent(`
-Name: ${formData.name}
-Email: ${formData.email}
-Company: ${formData.company}
-Phone: ${formData.phone}
-Budget: ${formData.budget}
-Timeline: ${formData.timeline}
+      const subject = `Contact from ${data.name} - ${data.company}`
+      const body = `
+Name: ${data.name}
+Email: ${data.email}
+Company: ${data.company}
+Phone: ${data.phone}
+Timeline: ${data.timeline}
 
 Message:
-${formData.message}
-      `)}`
-
-      window.location.href = mailtoLink
-      setSubmitStatus('success')
+${data.message}`
+      
+      const mailtoLink = `mailto:info@prop-shop.ai?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+      
+      setTimeout(() => {
+        window.location.href = mailtoLink
+        setSubmitStatus('success')
+        setIsSubmitting(false)
+        
+        setTimeout(() => {
+          e.currentTarget.reset()
+          setSubmitStatus('idle')
+        }, 3000)
+      }, 500)
     } catch (error) {
       console.error('Error sending email:', error)
       setSubmitStatus('error')
-    } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-[#0B1220] text-white">
-      <Header />
-      
-      <main className="container mx-auto px-4 py-16">
-        <div className="max-w-4xl mx-auto">
-          {/* Header Section */}
-          <div className="text-center mb-16">
-            <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-[#2D5BFF] to-[#9AF23A] bg-clip-text text-transparent">
-              Let&apos;s Build Something
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#0B1220',
+      color: 'white',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      lineHeight: 1.6,
+      margin: 0,
+      padding: 0,
+      boxSizing: 'border-box'
+    }}>
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: '4rem 1rem'
+      }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '4rem',
+          alignItems: 'center'
+        }}>
+          {/* Left Column - Content */}
+          <div style={{ paddingRight: '2rem' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              marginBottom: '1.5rem'
+            }}>
+              <div style={{
+                height: '1px',
+                width: '48px',
+                background: 'linear-gradient(to right, #9AF23A, #2D5BFF)'
+              }}></div>
+              <span style={{
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                color: '#9AF23A',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em'
+              }}>Get Started</span>
+            </div>
+            
+            <h1 style={{
+              fontSize: '3rem',
+              fontWeight: 700,
+              lineHeight: 1.2,
+              marginBottom: '1.5rem'
+            }}>
+              Ready to transform your procurement process?
+              <span style={{
+                background: 'linear-gradient(to right, #2D5BFF, #9AF23A, #FF7A29)',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                display: 'block',
+                marginTop: '0.5rem'
+              }}>procurement process?</span>
             </h1>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Ready to transform your procurement process? Get in touch and let&apos;s discuss how Prop Shop AI can help you win more contracts.
+            
+            <p style={{
+              color: '#9CA3AF',
+              fontSize: '1.125rem',
+              lineHeight: 1.75,
+              marginBottom: '2rem'
+            }}>
+              Get in touch and let&apos;s discuss how Prop Shop AI can help you win more contracts with AI-powered proposal generation.
             </p>
-          </div>
 
-          {/* Contact Form */}
-          <div className="grid md:grid-cols-2 gap-12">
-            <div>
-              <h2 className="text-3xl font-bold mb-6">Get Started</h2>
-              <p className="text-gray-300 mb-8">
-                Whether you&apos;re a small business looking to compete or a prime contractor seeking efficiency, we&apos;re here to help you succeed in government contracting.
-              </p>
-              
-              <div className="space-y-6">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-[#2D5BFF] to-[#9AF23A] rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Email</h3>
-                    <p className="text-gray-300">info@prop-shop.ai</p>
-                  </div>
+            {/* Contact Cards */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '1rem',
+                padding: '1rem',
+                background: '#0F1628',
+                border: '1px solid rgba(255, 255, 255, 0.05)',
+                borderRadius: '0.75rem',
+                transition: 'all 0.3s ease',
+                cursor: 'pointer'
+              }}>
+                <div style={{
+                  flexShrink: 0,
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '0.5rem',
+                  background: 'linear-gradient(135deg, rgba(45, 91, 255, 0.2), rgba(154, 242, 58, 0.2))',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.25rem'
+                }}>✉</div>
+                <div style={{ flex: 1 }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.25rem' }}>Email us directly</h3>
+                  <p style={{ color: '#9AF23A', fontSize: '0.875rem', marginBottom: '0.25rem' }}>info@prop-shop.ai</p>
+                  <p style={{ color: '#6B7280', fontSize: '0.75rem' }}>We&apos;ll respond within 24 hours</p>
                 </div>
-                
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-[#FF7A29] to-[#9AF23A] rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Response Time</h3>
-                    <p className="text-gray-300">Within 24 hours</p>
-                  </div>
+              </div>
+              
+              <a href="/book-demo" style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '1rem',
+                padding: '1rem',
+                background: '#0F1628',
+                border: '1px solid rgba(255, 255, 255, 0.05)',
+                borderRadius: '0.75rem',
+                transition: 'all 0.3s ease',
+                cursor: 'pointer',
+                textDecoration: 'none',
+                color: 'inherit'
+              }}>
+                <div style={{
+                  flexShrink: 0,
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '0.5rem',
+                  background: 'linear-gradient(135deg, rgba(45, 91, 255, 0.2), rgba(154, 242, 58, 0.2))',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.25rem'
+                }}>📅</div>
+                <div style={{ flex: 1 }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.25rem' }}>Book a demo</h3>
+                  <p style={{ color: '#9AF23A', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Schedule 30 minutes with our team</p>
+                  <p style={{ color: '#6B7280', fontSize: '0.75rem' }}>See Prop Shop AI in action</p>
+                </div>
+                <svg style={{ color: '#6B7280', transition: 'color 0.3s ease' }} width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+              
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '1rem',
+                padding: '1rem',
+                background: '#0F1628',
+                border: '1px solid rgba(255, 255, 255, 0.05)',
+                borderRadius: '0.75rem',
+                transition: 'all 0.3s ease',
+                cursor: 'pointer'
+              }}>
+                <div style={{
+                  flexShrink: 0,
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '0.5rem',
+                  background: 'linear-gradient(135deg, rgba(45, 91, 255, 0.2), rgba(154, 242, 58, 0.2))',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.25rem'
+                }}>💬</div>
+                <div style={{ flex: 1 }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.25rem' }}>Live chat</h3>
+                  <p style={{ color: '#9AF23A', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Available Mon-Fri, 9am-6pm EST</p>
+                  <p style={{ color: '#6B7280', fontSize: '0.75rem' }}>Get instant answers</p>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium mb-2">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      required
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BFF] focus:border-transparent"
-                      placeholder="John Smith"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium mb-2">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      required
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BFF] focus:border-transparent"
-                      placeholder="john@company.com"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="company" className="block text-sm font-medium mb-2">
-                      Company *
-                    </label>
-                    <input
-                      type="text"
-                      id="company"
-                      name="company"
-                      required
-                      value={formData.company}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BFF] focus:border-transparent"
-                      placeholder="Your Company"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="phone" className="block text-sm font-medium mb-2">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BFF] focus:border-transparent"
-                      placeholder="(555) 123-4567"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="budget" className="block text-sm font-medium mb-2">
-                      Budget Range
-                    </label>
-                    <select
-                      id="budget"
-                      name="budget"
-                      value={formData.budget}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BFF] focus:border-transparent"
-                    >
-                      <option value="">Select budget range</option>
-                      <option value="Under $10k">Under $10k</option>
-                      <option value="$10k - $50k">$10k - $50k</option>
-                      <option value="$50k - $100k">$50k - $100k</option>
-                      <option value="$100k - $500k">$100k - $500k</option>
-                      <option value="$500k+">$500k+</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="timeline" className="block text-sm font-medium mb-2">
-                      Timeline
-                    </label>
-                    <select
-                      id="timeline"
-                      name="timeline"
-                      value={formData.timeline}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BFF] focus:border-transparent"
-                    >
-                      <option value="">Select timeline</option>
-                      <option value="Immediate">Immediate</option>
-                      <option value="1-3 months">1-3 months</option>
-                      <option value="3-6 months">3-6 months</option>
-                      <option value="6+ months">6+ months</option>
-                    </select>
-                  </div>
-                </div>
-
+          {/* Right Column - Form */}
+          <div style={{
+            background: '#0F1628',
+            border: '1px solid rgba(255, 255, 255, 0.05)',
+            borderRadius: '1rem',
+            padding: '2rem'
+          }}>
+            <div style={{ marginBottom: '2rem' }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem' }}>Contact our team</h2>
+              <p style={{ color: '#9CA3AF', fontSize: '0.875rem' }}>Fill out the form and we&apos;ll be in touch shortly.</p>
+            </div>
+            
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium mb-2">
-                    Tell us about your needs *
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
+                  <label style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    color: '#D1D5DB',
+                    marginBottom: '0.5rem'
+                  }} htmlFor="name">First name</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="John"
                     required
-                    rows={6}
-                    value={formData.message}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BFF] focus:border-transparent resize-none"
-                    placeholder="Describe your current procurement challenges, specific opportunities you&apos;re pursuing, or how you&apos;d like to use Prop Shop AI..."
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1rem',
+                      background: '#0B1220',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '0.5rem',
+                      color: 'white',
+                      fontSize: '1rem',
+                      transition: 'all 0.3s ease',
+                      fontFamily: 'inherit'
+                    }}
                   />
                 </div>
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    color: '#D1D5DB',
+                    marginBottom: '0.5rem'
+                  }} htmlFor="email">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="john@company.com"
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1rem',
+                      background: '#0B1220',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '0.5rem',
+                      color: 'white',
+                      fontSize: '1rem',
+                      transition: 'all 0.3s ease',
+                      fontFamily: 'inherit'
+                    }}
+                  />
+                </div>
+              </div>
 
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-[#2D5BFF] to-[#9AF23A] text-white font-semibold py-4 px-8 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: '#D1D5DB',
+                  marginBottom: '0.5rem'
+                }} htmlFor="company">Company</label>
+                <input
+                  type="text"
+                  id="company"
+                  name="company"
+                  placeholder="Your company name"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    background: '#0B1220',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '0.5rem',
+                    color: 'white',
+                    fontSize: '1rem',
+                    transition: 'all 0.3s ease',
+                    fontFamily: 'inherit'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: '#D1D5DB',
+                  marginBottom: '0.5rem'
+                }} htmlFor="phone">Phone number</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  placeholder="(555) 123-4567"
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    background: '#0B1220',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '0.5rem',
+                    color: 'white',
+                    fontSize: '1rem',
+                    transition: 'all 0.3s ease',
+                    fontFamily: 'inherit'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: '#D1D5DB',
+                  marginBottom: '0.5rem'
+                }} htmlFor="timeline">Timeline</label>
+                <select
+                  id="timeline"
+                  name="timeline"
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    background: '#0B1220',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '0.5rem',
+                    color: 'white',
+                    fontSize: '1rem',
+                    transition: 'all 0.3s ease',
+                    fontFamily: 'inherit',
+                    cursor: 'pointer',
+                    appearance: 'none',
+                    backgroundImage: 'url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3e%3cpath stroke=\'%236b7280\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M6 8l4 4 4-4\'/%3e%3c/svg%3e")',
+                    backgroundPosition: 'right 0.5rem center',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: '1.5em 1.5em',
+                    paddingRight: '2.5rem'
+                  }}
                 >
-                  {isSubmitting ? 'Sending...' : 'Send Message'}
-                </button>
+                  <option value="">Select timeline</option>
+                  <option value="Immediate">Immediate</option>
+                  <option value="1-3 months">1-3 months</option>
+                  <option value="3-6 months">3-6 months</option>
+                  <option value="6+ months">6+ months</option>
+                </select>
+              </div>
 
-                {submitStatus === 'success' && (
-                  <div className="text-green-400 text-center py-2">
-                    Message sent successfully! We&apos;ll get back to you within 24 hours.
-                  </div>
-                )}
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: '#D1D5DB',
+                  marginBottom: '0.5rem'
+                }} htmlFor="message">How can we help?</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  rows={4}
+                  placeholder="Tell us about your current procurement challenges..."
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    background: '#0B1220',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '0.5rem',
+                    color: 'white',
+                    fontSize: '1rem',
+                    transition: 'all 0.3s ease',
+                    fontFamily: 'inherit',
+                    resize: 'none'
+                  }}
+                />
+              </div>
 
-                {submitStatus === 'error' && (
-                  <div className="text-red-400 text-center py-2">
-                    There was an error sending your message. Please try again or email us directly at info@prop-shop.ai
-                  </div>
-                )}
-              </form>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                style={{
+                  width: '100%',
+                  position: 'relative',
+                  background: 'linear-gradient(to right, #2D5BFF, #9AF23A)',
+                  padding: '1px',
+                  borderRadius: '0.5rem',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  marginTop: '1.5rem'
+                }}
+              >
+                <div style={{
+                  background: '#0F1628',
+                  borderRadius: '0.45rem',
+                  padding: '0.875rem 1.5rem',
+                  fontWeight: 600,
+                  color: 'white',
+                  transition: 'background 0.3s ease'
+                }}>
+                  {isSubmitting ? 'Sending...' : 'Send message'}
+                </div>
+              </button>
+
+              {submitStatus === 'success' && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '0.5rem',
+                  fontSize: '0.875rem',
+                  marginTop: '1rem',
+                  background: 'rgba(154, 242, 58, 0.1)',
+                  border: '1px solid rgba(154, 242, 58, 0.2)',
+                  color: '#9AF23A'
+                }}>
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Message sent! We&apos;ll get back to you within 24 hours.
+                </div>
+              )}
+
+              {submitStatus === 'error' && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '0.5rem',
+                  fontSize: '0.875rem',
+                  marginTop: '1rem',
+                  background: 'rgba(255, 122, 41, 0.1)',
+                  border: '1px solid rgba(255, 122, 41, 0.2)',
+                  color: '#FF7A29'
+                }}>
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Something went wrong. Please try again or email us directly.
+                </div>
+              )}
+            </form>
+
+            <div style={{
+              marginTop: '2rem',
+              paddingTop: '1.5rem',
+              borderTop: '1px solid rgba(255, 255, 255, 0.05)'
+            }}>
+              <p style={{
+                fontSize: '0.75rem',
+                color: '#6B7280',
+                lineHeight: 1.5
+              }}>
+                By contacting us, you agree to our 
+                <a href="/privacy" style={{ color: '#2D5BFF', textDecoration: 'none', transition: 'color 0.3s ease' }}> Privacy Policy</a> and 
+                <a href="/terms" style={{ color: '#2D5BFF', textDecoration: 'none', transition: 'color 0.3s ease' }}> Terms of Service</a>. 
+                We&apos;ll use your information to respond to your inquiry and improve our services.
+              </p>
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   )
 }

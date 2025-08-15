@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Inter, IBM_Plex_Mono } from "next/font/google"
 import "./globals.css"
 import { Header } from "@/components/layout/header"
+import { Footer } from "@/components/layout/footer"
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -19,6 +20,11 @@ export const metadata: Metadata = {
   description: "Find, win, and deliver government contracts — without the gatekeepers. The procurement intelligence platform that levels the playing field for challengers and incumbents alike.",
   keywords: "procurement intelligence, government contracts, proposal automation, compliance platform, federal contracting, DoD contracts, procurement platform, AI procurement",
   authors: [{ name: "Prop Shop AI" }],
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
   openGraph: {
     title: "Prop Shop AI - Procurement Intelligence Platform",
     description: "Where innovation meets compliance. The infrastructure layer for government procurement.",
@@ -86,10 +92,151 @@ export default function RootLayout({
               50% { opacity: 0.6; transform: scale(1.1); }
             }
             
+            /* Enhanced Fireworks Animation - Flowing from Top and Bottom */
+            .fireworks {
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              pointer-events: none;
+              z-index: -999;
+              overflow: hidden;
+            }
+            
+            .firework {
+              position: absolute;
+              width: 4px;
+              height: 4px;
+              border-radius: 50%;
+              animation: firework-float 8s ease-in-out infinite;
+              opacity: 0;
+            }
+            
+            /* Bottom to Top Fireworks */
+            .firework:nth-child(1) {
+              left: 10%;
+              top: 20%;
+              background: rgba(45, 91, 255, 0.25);
+              animation-delay: 0s;
+              animation-duration: 12s;
+              animation-name: firework-float-up;
+            }
+            
+            .firework:nth-child(2) {
+              left: 85%;
+              top: 15%;
+              background: rgba(154, 242, 58, 0.2);
+              animation-delay: 2s;
+              animation-duration: 10s;
+              animation-name: firework-float-up;
+            }
+            
+            .firework:nth-child(3) {
+              left: 20%;
+              top: 80%;
+              background: rgba(255, 122, 41, 0.22);
+              animation-delay: 4s;
+              animation-duration: 14s;
+              animation-name: firework-float-up;
+            }
+            
+            .firework:nth-child(4) {
+              left: 75%;
+              top: 70%;
+              background: rgba(45, 91, 255, 0.2);
+              animation-delay: 6s;
+              animation-duration: 11s;
+              animation-name: firework-float-up;
+            }
+            
+            /* Top to Bottom Fireworks */
+            .firework:nth-child(5) {
+              left: 50%;
+              top: 30%;
+              background: rgba(154, 242, 58, 0.25);
+              animation-delay: 1s;
+              animation-duration: 13s;
+              animation-name: firework-float-down;
+            }
+            
+            .firework:nth-child(6) {
+              left: 30%;
+              top: 60%;
+              background: rgba(255, 122, 41, 0.2);
+              animation-delay: 3s;
+              animation-duration: 9s;
+              animation-name: firework-float-down;
+            }
+            
+            .firework:nth-child(7) {
+              left: 90%;
+              top: 50%;
+              background: rgba(45, 91, 255, 0.18);
+              animation-delay: 5s;
+              animation-duration: 15s;
+              animation-name: firework-float-down;
+            }
+            
+            .firework:nth-child(8) {
+              left: 5%;
+              top: 40%;
+              background: rgba(154, 242, 58, 0.22);
+              animation-delay: 7s;
+              animation-duration: 12s;
+              animation-name: firework-float-down;
+            }
+            
+            /* Bottom to Top Animation */
+            @keyframes firework-float-up {
+              0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+              }
+              15% {
+                opacity: 0.4;
+              }
+              50% {
+                transform: translateY(50vh) scale(1);
+                opacity: 0.3;
+              }
+              85% {
+                opacity: 0.2;
+              }
+              100% {
+                transform: translateY(-20vh) scale(0.5);
+                opacity: 0;
+              }
+            }
+            
+            /* Top to Bottom Animation */
+            @keyframes firework-float-down {
+              0% {
+                transform: translateY(-20vh) scale(0);
+                opacity: 0;
+              }
+              15% {
+                opacity: 0.4;
+              }
+              50% {
+                transform: translateY(50vh) scale(1);
+                opacity: 0.3;
+              }
+              85% {
+                opacity: 0.2;
+              }
+              100% {
+                transform: translateY(100vh) scale(0.5);
+                opacity: 0;
+              }
+            }
+            
             .container {
               max-width: 1200px;
               margin: 0 auto;
               padding: 0 1rem;
+              position: relative;
+              z-index: 10;
             }
             
             /* Enhanced Header with Tech Vibes */
@@ -99,7 +246,7 @@ export default function RootLayout({
               backdrop-filter: blur(20px);
               position: sticky;
               top: 0;
-              z-index: 50;
+              z-index: 100;
               padding: 1rem 0;
             }
             
@@ -118,43 +265,32 @@ export default function RootLayout({
             }
             
             .logo-icon {
-              height: 2rem;
-              width: 2rem;
+              height: 6rem;
+              width: 6rem;
               border-radius: 0.5rem;
-              background: linear-gradient(-45deg, #0B1220, #2D5BFF, #9AF23A, #FF7A29);
-              background-size: 400% 400%;
-              animation: tech-gradient 15s ease infinite;
               display: flex;
               align-items: center;
               justify-content: center;
-              box-shadow: 0 0 20px rgba(45, 91, 255, 0.4);
-              font-weight: bold;
-              font-family: 'IBM Plex Mono', monospace;
               position: relative;
-              overflow: hidden;
+              margin-right: 0;
             }
             
-            .logo-icon::before {
-              content: '';
-              position: absolute;
-              top: -50%;
-              left: -50%;
-              width: 200%;
-              height: 200%;
-              background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-              animation: tech-shine 3s ease-in-out infinite;
+            .logo-icon img {
+              width: 6rem;
+              height: 6rem;
+              filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
             }
             
-            @keyframes tech-shine {
-              0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-              50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-              100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            .brand {
+              display: flex;
+              align-items: center;
             }
             
             .logo-text {
               font-weight: bold;
               font-size: 1.25rem;
               font-family: 'Inter', sans-serif;
+              margin-left: 0.1rem;
             }
             
             nav {
@@ -261,6 +397,8 @@ export default function RootLayout({
               position: relative;
               overflow: hidden;
             }
+            
+
             
             .hero::before {
               content: '';
@@ -548,15 +686,7 @@ export default function RootLayout({
               position: relative;
             }
             
-            .quote::before {
-              content: '"';
-              position: absolute;
-              top: -1rem;
-              left: -2rem;
-              font-size: 4rem;
-              color: #9AF23A;
-              font-family: serif;
-            }
+
             
             .quote-attribution {
               font-size: 1rem;
@@ -635,8 +765,21 @@ export default function RootLayout({
         }} />
       </head>
       <body className={`${inter.variable} ${ibmPlexMono.variable} min-h-screen bg-[#0B1220] text-white`}>
+        {/* Subtle Fireworks Background */}
+        <div className="fireworks">
+          <div className="firework"></div>
+          <div className="firework"></div>
+          <div className="firework"></div>
+          <div className="firework"></div>
+          <div className="firework"></div>
+          <div className="firework"></div>
+          <div className="firework"></div>
+          <div className="firework"></div>
+        </div>
+        
         <Header />
         {children}
+        <Footer />
       </body>
     </html>
   )

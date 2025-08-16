@@ -284,7 +284,7 @@ export default function SettingsPage() {
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id as 'profile' | 'notifications' | 'preferences' | 'security')}
               style={{
                 padding: '0.75rem 1.5rem',
                 background: activeTab === tab.id ? 'rgba(154, 242, 58, 0.2)' : 'transparent',
@@ -793,7 +793,7 @@ export default function SettingsPage() {
               }}>
                 <h4 style={{ marginBottom: '0.5rem' }}>Password Change</h4>
                 <p style={{ fontSize: '0.875rem', margin: 0 }}>
-                  To change your password, please use the "Forgot Password" option on the sign-in page.
+                  To change your password, please use the &quot;Forgot Password&quot; option on the sign-in page.
                 </p>
               </div>
             </div>

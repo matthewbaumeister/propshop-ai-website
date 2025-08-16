@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { useAuth } from "@/contexts/AuthContext"
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -31,6 +32,7 @@ const navigation = [
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { user, signOut } = useAuth()
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -107,42 +109,43 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
             <div className="flex flex-1"></div>
             <div className="flex items-center gap-x-4 lg:gap-x-6">
-              <Badge variant="secondary">Pro Plan</Badge>
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src="/avatars/01.png" alt="@user" />
-                      <AvatarFallback>JD</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">John Doe</p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        john@example.com
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    Billing
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    Log out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {user && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src="/avatars/01.png" alt="@user" />
+                        <AvatarFallback>{user.name?.charAt(0) || user.email.charAt(0).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user.name || 'User'}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <Link href="/dashboard/profile">
+                      <DropdownMenuItem>
+                        Profile
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href="/dashboard/settings">
+                      <DropdownMenuItem>
+                        Settings
+                      </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={signOut}>
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
         </div>

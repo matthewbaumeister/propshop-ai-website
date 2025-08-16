@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-// import { useAuth } from '@/contexts/AuthContext'
+import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -13,7 +13,7 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   
-  // const { signIn } = useAuth()
+  const { signIn } = useAuth()
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -22,17 +22,14 @@ export default function SignInPage() {
     setLoading(true)
 
     try {
-      // const { error } = await signIn(formData.email, formData.password)
+      const { error } = await signIn(formData.email, formData.password)
 
-      // if (error) {
-      //   setError(error.message)
-      // } else {
-      //   // Redirect to dashboard on successful login
-      //   router.push('/dashboard')
-      // }
-      
-      // Temporary: just redirect for now
-      router.push('/dashboard')
+      if (error) {
+        setError(error.message)
+      } else {
+        // Redirect to dashboard on successful login
+        router.push('/dashboard')
+      }
     } catch (err) {
       setError('An unexpected error occurred')
     } finally {

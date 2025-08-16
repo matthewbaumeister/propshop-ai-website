@@ -3,6 +3,7 @@ import { Inter, IBM_Plex_Mono } from "next/font/google"
 import "./globals.css"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
+import { AuthProvider } from "@/contexts/AuthContext"
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -778,7 +779,9 @@ export default function RootLayout({
         </div>
         
         <Header />
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
         <Footer />
       </body>
     </html>

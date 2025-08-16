@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-// import { useAuth } from '@/contexts/AuthContext'
+import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -18,7 +18,7 @@ export default function SignUpPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   
-  // const { signUp } = useAuth()
+  const { signUp } = useAuth()
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,28 +40,20 @@ export default function SignUpPage() {
     }
 
     try {
-      // const { error } = await signUp(
-      //   formData.email,
-      //   formData.password,
-      //   formData.firstName,
-      //   formData.lastName,
-      //   formData.company
-      // )
+      const { error } = await signUp(
+        formData.email,
+        formData.password,
+        formData.firstName
+      )
 
-      // if (error) {
-      //   setError(error.message)
-      // } else {
-      //   setSuccess(true)
-      //   setTimeout(() => {
-      //     router.push('/auth/verify-email')
-      //   }, 2000)
-      // }
-      
-      // Temporary: just show success for now
-      setSuccess(true)
-      setTimeout(() => {
-        router.push('/auth/verify-email')
-      }, 2000)
+      if (error) {
+        setError(error.message)
+      } else {
+        setSuccess(true)
+        setTimeout(() => {
+          router.push('/auth/verify-email')
+        }, 2000)
+      }
     } catch (err) {
       setError('An unexpected error occurred')
     } finally {

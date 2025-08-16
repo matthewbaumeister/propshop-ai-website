@@ -138,24 +138,6 @@ export function Header() {
                     <div style={{ fontSize: '0.875rem', color: '#9CA3AF' }}>{user.email}</div>
                   </div>
                   
-                  <Link href="/dashboard" className="block" style={{
-                    padding: '0.5rem 1rem',
-                    color: 'white',
-                    textDecoration: 'none',
-                    transition: 'background 0.2s ease'
-                  }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-                    Dashboard
-                  </Link>
-                  
-                  <Link href="/dashboard/profile" className="block" style={{
-                    padding: '0.5rem 1rem',
-                    color: 'white',
-                    textDecoration: 'none',
-                    transition: 'background 0.2s ease'
-                  }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-                    Profile
-                  </Link>
-                  
                   <Link href="/dashboard/settings" className="block" style={{
                     padding: '0.5rem 1rem',
                     color: 'white',

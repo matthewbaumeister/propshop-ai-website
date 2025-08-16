@@ -17,7 +17,7 @@ export default function AboutPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[#0B1220] text-white">
+    <div className="page-content min-h-screen text-white">
       <main className="container mx-auto px-4 py-24">
         {/* Hero */}
         <section className="about-hero max-w-6xl mx-auto text-center mb-12">

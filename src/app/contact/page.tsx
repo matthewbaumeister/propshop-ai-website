@@ -1,20 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
-
-  // Force cache refresh
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (!sessionStorage.getItem('contactPageRefreshed')) {
-        sessionStorage.setItem('contactPageRefreshed', 'true')
-        window.location.reload()
-      }
-    }
-  }, [])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -63,10 +53,9 @@ ${data.message}`
   }
 
   return (
-    <div style={{
+    <div className="page-content" style={{
       minHeight: '100vh',
-      backgroundColor: '#0B1220',
-      color: 'white',
+      color: 'var(--text-primary)',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       lineHeight: 1.6,
       margin: 0,
@@ -95,56 +84,72 @@ ${data.message}`
               <div style={{
                 height: '1px',
                 width: '48px',
-                background: 'linear-gradient(to right, #9AF23A, #2D5BFF)'
+                background: 'linear-gradient(to right, var(--accent-secondary), var(--accent-primary))'
               }}></div>
               <span style={{
                 fontSize: '0.875rem',
                 fontWeight: 500,
-                color: '#9AF23A',
+                color: 'var(--accent-secondary)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.1em'
-              }}>Get Started</span>
+              }}>
+                GET STARTED
+              </span>
             </div>
             
             <h1 style={{
-              fontSize: '3rem',
-              fontWeight: 700,
-              lineHeight: 1.2,
-              marginBottom: '1.5rem'
+              fontSize: '3.5rem',
+              fontWeight: 800,
+              lineHeight: 1.1,
+              marginBottom: '1.5rem',
+              color: 'var(--text-primary)'
             }}>
               Ready to transform your procurement process?
               <span style={{
-                background: 'linear-gradient(to right, #2D5BFF, #9AF23A, #FF7A29)',
+                background: 'linear-gradient(to right, var(--accent-primary), var(--accent-secondary), var(--accent-primary))',
                 WebkitBackgroundClip: 'text',
                 backgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                display: 'block',
-                marginTop: '0.5rem'
-              }}>procurement process?</span>
+                display: 'block'
+              }}>
+                procurement process?
+              </span>
             </h1>
             
             <p style={{
-              color: '#9CA3AF',
+              color: 'var(--text-secondary)',
               fontSize: '1.125rem',
               lineHeight: 1.75,
-              marginBottom: '2rem'
+              marginBottom: '3rem'
             }}>
-              Get in touch and let&apos;s discuss how Prop Shop AI can help you win more contracts with AI-powered proposal generation.
+              Get in touch and let's discuss how Prop Shop AI can help you win more contracts with AI-powered proposal generation.
             </p>
 
             {/* Contact Cards */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {/* Email Card */}
               <div style={{
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: '1rem',
                 padding: '1rem',
-                background: '#0F1628',
-                border: '1px solid rgba(255, 255, 255, 0.05)',
+                background: 'var(--bg-primary)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: '0.75rem',
                 transition: 'all 0.3s ease',
                 cursor: 'pointer'
-              }}>
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.borderColor = 'rgba(154, 242, 58, 0.3)'
+                e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.3)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'
+                e.currentTarget.style.boxShadow = 'none'
+              }}
+              >
                 <div style={{
                   flexShrink: 0,
                   width: '40px',
@@ -157,25 +162,37 @@ ${data.message}`
                   fontSize: '1.25rem'
                 }}>✉</div>
                 <div style={{ flex: 1 }}>
-                  <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.25rem' }}>Email us directly</h3>
-                  <p style={{ color: '#9AF23A', fontSize: '0.875rem', marginBottom: '0.25rem' }}>info@prop-shop.ai</p>
-                  <p style={{ color: '#6B7280', fontSize: '0.75rem' }}>We&apos;ll respond within 24 hours</p>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.25rem', color: 'var(--text-primary)' }}>Email us directly</h3>
+                  <p style={{ color: 'var(--accent-secondary)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>info@prop-shop.ai</p>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>We'll respond within 24 hours</p>
                 </div>
               </div>
               
-              <a href="/book-demo" style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '1rem',
-                padding: '1rem',
-                background: '#0F1628',
-                border: '1px solid rgba(255, 255, 255, 0.05)',
-                borderRadius: '0.75rem',
-                transition: 'all 0.3s ease',
-                cursor: 'pointer',
-                textDecoration: 'none',
-                color: 'inherit'
-              }}>
+              {/* Book Demo Card */}
+              <div 
+                onClick={() => window.location.href = '/book-demo'}
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '1rem',
+                  padding: '1rem',
+                  background: 'var(--bg-primary)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '0.75rem',
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)'
+                  e.currentTarget.style.borderColor = 'rgba(154, 242, 58, 0.3)'
+                  e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.3)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'
+                  e.currentTarget.style.boxShadow = 'none'
+                }}
+              >
                 <div style={{
                   flexShrink: 0,
                   width: '40px',
@@ -188,26 +205,38 @@ ${data.message}`
                   fontSize: '1.25rem'
                 }}>📅</div>
                 <div style={{ flex: 1 }}>
-                  <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.25rem' }}>Book a demo</h3>
-                  <p style={{ color: '#9AF23A', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Schedule 30 minutes with our team</p>
-                  <p style={{ color: '#6B7280', fontSize: '0.75rem' }}>See Prop Shop AI in action</p>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.25rem', color: 'var(--text-primary)' }}>Book a demo</h3>
+                  <p style={{ color: 'var(--accent-secondary)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Schedule 30 minutes with our team</p>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>See Prop Shop AI in action</p>
                 </div>
-                <svg style={{ color: '#6B7280', transition: 'color 0.3s ease' }} width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg style={{ color: 'var(--text-secondary)', transition: 'color 0.3s ease' }} width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                 </svg>
-              </a>
+              </div>
               
+              {/* Live Chat Card */}
               <div style={{
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: '1rem',
                 padding: '1rem',
-                background: '#0F1628',
-                border: '1px solid rgba(255, 255, 255, 0.05)',
+                background: 'var(--bg-primary)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: '0.75rem',
                 transition: 'all 0.3s ease',
                 cursor: 'pointer'
-              }}>
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.borderColor = 'rgba(154, 242, 58, 0.3)'
+                e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.3)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'
+                e.currentTarget.style.boxShadow = 'none'
+              }}
+              >
                 <div style={{
                   flexShrink: 0,
                   width: '40px',
@@ -220,9 +249,9 @@ ${data.message}`
                   fontSize: '1.25rem'
                 }}>💬</div>
                 <div style={{ flex: 1 }}>
-                  <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.25rem' }}>Live chat</h3>
-                  <p style={{ color: '#9AF23A', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Available Mon-Fri, 9am-6pm EST</p>
-                  <p style={{ color: '#6B7280', fontSize: '0.75rem' }}>Get instant answers</p>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.25rem', color: 'var(--text-primary)' }}>Live chat</h3>
+                  <p style={{ color: 'var(--accent-secondary)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Available Mon-Fri, 9am-6pm EST</p>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Get instant answers</p>
                 </div>
               </div>
             </div>
@@ -230,14 +259,14 @@ ${data.message}`
 
           {/* Right Column - Form */}
           <div style={{
-            background: '#0F1628',
-            border: '1px solid rgba(255, 255, 255, 0.05)',
+            background: 'var(--bg-primary)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
             borderRadius: '1rem',
             padding: '2rem'
           }}>
             <div style={{ marginBottom: '2rem' }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem' }}>Contact our team</h2>
-              <p style={{ color: '#9CA3AF', fontSize: '0.875rem' }}>Fill out the form and we&apos;ll be in touch shortly.</p>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>Contact our team</h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Fill out the form and we'll be in touch shortly.</p>
             </div>
             
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -247,7 +276,7 @@ ${data.message}`
                     display: 'block',
                     fontSize: '0.875rem',
                     fontWeight: 500,
-                    color: '#D1D5DB',
+                    color: 'var(--text-primary)',
                     marginBottom: '0.5rem'
                   }} htmlFor="name">First name</label>
                   <input
@@ -259,10 +288,10 @@ ${data.message}`
                     style={{
                       width: '100%',
                       padding: '0.75rem 1rem',
-                      background: '#0B1220',
+                      background: 'var(--input-bg)',
                       border: '1px solid rgba(255, 255, 255, 0.1)',
                       borderRadius: '0.5rem',
-                      color: 'white',
+                      color: 'var(--text-primary)',
                       fontSize: '1rem',
                       transition: 'all 0.3s ease',
                       fontFamily: 'inherit'
@@ -274,7 +303,7 @@ ${data.message}`
                     display: 'block',
                     fontSize: '0.875rem',
                     fontWeight: 500,
-                    color: '#D1D5DB',
+                    color: 'var(--text-primary)',
                     marginBottom: '0.5rem'
                   }} htmlFor="email">Email</label>
                   <input
@@ -286,10 +315,10 @@ ${data.message}`
                     style={{
                       width: '100%',
                       padding: '0.75rem 1rem',
-                      background: '#0B1220',
+                      background: 'var(--input-bg)',
                       border: '1px solid rgba(255, 255, 255, 0.1)',
                       borderRadius: '0.5rem',
-                      color: 'white',
+                      color: 'var(--text-primary)',
                       fontSize: '1rem',
                       transition: 'all 0.3s ease',
                       fontFamily: 'inherit'
@@ -303,7 +332,7 @@ ${data.message}`
                   display: 'block',
                   fontSize: '0.875rem',
                   fontWeight: 500,
-                  color: '#D1D5DB',
+                  color: 'var(--text-primary)',
                   marginBottom: '0.5rem'
                 }} htmlFor="company">Company</label>
                 <input
@@ -315,10 +344,10 @@ ${data.message}`
                   style={{
                     width: '100%',
                     padding: '0.75rem 1rem',
-                    background: '#0B1220',
+                    background: 'var(--input-bg)',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
                     borderRadius: '0.5rem',
-                    color: 'white',
+                    color: 'var(--text-primary)',
                     fontSize: '1rem',
                     transition: 'all 0.3s ease',
                     fontFamily: 'inherit'
@@ -331,7 +360,7 @@ ${data.message}`
                   display: 'block',
                   fontSize: '0.875rem',
                   fontWeight: 500,
-                  color: '#D1D5DB',
+                  color: 'var(--text-primary)',
                   marginBottom: '0.5rem'
                 }} htmlFor="phone">Phone number</label>
                 <input
@@ -342,10 +371,10 @@ ${data.message}`
                   style={{
                     width: '100%',
                     padding: '0.75rem 1rem',
-                    background: '#0B1220',
+                    background: 'var(--input-bg)',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
                     borderRadius: '0.5rem',
-                    color: 'white',
+                    color: 'var(--text-primary)',
                     fontSize: '1rem',
                     transition: 'all 0.3s ease',
                     fontFamily: 'inherit'
@@ -358,7 +387,7 @@ ${data.message}`
                   display: 'block',
                   fontSize: '0.875rem',
                   fontWeight: 500,
-                  color: '#D1D5DB',
+                  color: 'var(--text-primary)',
                   marginBottom: '0.5rem'
                 }} htmlFor="timeline">Timeline</label>
                 <select
@@ -367,10 +396,10 @@ ${data.message}`
                   style={{
                     width: '100%',
                     padding: '0.75rem 1rem',
-                    background: '#0B1220',
+                    background: 'var(--input-bg)',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
                     borderRadius: '0.5rem',
-                    color: 'white',
+                    color: 'var(--text-primary)',
                     fontSize: '1rem',
                     transition: 'all 0.3s ease',
                     fontFamily: 'inherit',
@@ -396,7 +425,7 @@ ${data.message}`
                   display: 'block',
                   fontSize: '0.875rem',
                   fontWeight: 500,
-                  color: '#D1D5DB',
+                  color: 'var(--text-primary)',
                   marginBottom: '0.5rem'
                 }} htmlFor="message">How can we help?</label>
                 <textarea
@@ -408,10 +437,10 @@ ${data.message}`
                   style={{
                     width: '100%',
                     padding: '0.75rem 1rem',
-                    background: '#0B1220',
+                    background: 'var(--input-bg)',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
                     borderRadius: '0.5rem',
-                    color: 'white',
+                    color: 'var(--text-primary)',
                     fontSize: '1rem',
                     transition: 'all 0.3s ease',
                     fontFamily: 'inherit',
@@ -426,7 +455,7 @@ ${data.message}`
                 style={{
                   width: '100%',
                   position: 'relative',
-                  background: 'linear-gradient(to right, #2D5BFF, #9AF23A)',
+                  background: 'linear-gradient(to right, var(--accent-primary), var(--accent-secondary))',
                   padding: '1px',
                   borderRadius: '0.5rem',
                   border: 'none',
@@ -436,7 +465,7 @@ ${data.message}`
                 }}
               >
                 <div style={{
-                  background: '#0F1628',
+                  background: 'var(--bg-primary)',
                   borderRadius: '0.45rem',
                   padding: '0.875rem 1.5rem',
                   fontWeight: 600,
@@ -458,12 +487,12 @@ ${data.message}`
                   marginTop: '1rem',
                   background: 'rgba(154, 242, 58, 0.1)',
                   border: '1px solid rgba(154, 242, 58, 0.2)',
-                  color: '#9AF23A'
+                  color: 'var(--accent-secondary)'
                 }}>
                   <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                   </svg>
-                  Message sent! We&apos;ll get back to you within 24 hours.
+                  Message sent! We'll get back to you within 24 hours.
                 </div>
               )}
 
@@ -478,7 +507,7 @@ ${data.message}`
                   marginTop: '1rem',
                   background: 'rgba(255, 122, 41, 0.1)',
                   border: '1px solid rgba(255, 122, 41, 0.2)',
-                  color: '#FF7A29'
+                  color: 'var(--accent-primary)'
                 }}>
                   <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -495,13 +524,13 @@ ${data.message}`
             }}>
               <p style={{
                 fontSize: '0.75rem',
-                color: '#6B7280',
+                color: 'var(--text-secondary)',
                 lineHeight: 1.5
               }}>
                 By contacting us, you agree to our 
-                <a href="/privacy" style={{ color: '#2D5BFF', textDecoration: 'none', transition: 'color 0.3s ease' }}> Privacy Policy</a> and 
-                <a href="/terms" style={{ color: '#2D5BFF', textDecoration: 'none', transition: 'color 0.3s ease' }}> Terms of Service</a>. 
-                We&apos;ll use your information to respond to your inquiry and improve our services.
+                <a href="/privacy" style={{ color: 'var(--accent-primary)', textDecoration: 'none', transition: 'color 0.3s ease' }}> Privacy Policy</a> and 
+                <a href="/terms" style={{ color: 'var(--accent-primary)', textDecoration: 'none', transition: 'color 0.3s ease' }}> Terms of Service</a>. 
+                We'll use your information to respond to your inquiry and improve our services.
               </p>
             </div>
           </div>

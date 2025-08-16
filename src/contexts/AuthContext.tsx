@@ -39,7 +39,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           name: session.user.user_metadata?.name || session.user.user_metadata?.full_name || session.user.email!.split('@')[0]
         }
         setUser(userData)
-        console.log('Session restored:', userData) // Debug log
       }
       setLoading(false)
     }
@@ -49,7 +48,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state change:', event, session?.user?.email) // Debug log
         if (session?.user) {
           const userData = {
             id: session.user.id,
@@ -57,10 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             name: session.user.user_metadata?.name || session.user.user_metadata?.full_name || session.user.email!.split('@')[0]
           }
           setUser(userData)
-          console.log('User state updated:', userData) // Debug log
         } else {
           setUser(null)
-          console.log('User signed out') // Debug log
         }
         setLoading(false)
       }
@@ -87,7 +83,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           name: data.user.user_metadata?.name || data.user.user_metadata?.full_name || email.split('@')[0]
         }
         setUser(userData)
-        console.log('User signed in:', userData) // Debug log
       }
 
       return {}

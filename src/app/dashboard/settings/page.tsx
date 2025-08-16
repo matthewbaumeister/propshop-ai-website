@@ -216,36 +216,42 @@ export default function SettingsPage() {
           justifyContent: 'space-between',
           marginBottom: '2rem'
         }}>
-          <h1 style={{
-            fontSize: '2.5rem',
-            fontWeight: 800,
-            lineHeight: 1.1,
-            color: 'white',
-            margin: 0
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '2rem'
           }}>
-            Account Settings
-          </h1>
-          <Link href="/dashboard" style={{
-            padding: '0.75rem 1.5rem',
-            background: 'rgba(255, 255, 255, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            borderRadius: '0.5rem',
-            color: 'white',
-            textDecoration: 'none',
-            fontSize: '0.875rem',
-            fontWeight: 500,
-            transition: 'all 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)'
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)'
-          }}>
-            ← Back to Dashboard
-          </Link>
+            <Link href="/dashboard" style={{
+              padding: '0.75rem 1.5rem',
+              background: 'rgba(255, 255, 255, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: '0.5rem',
+              color: 'white',
+              textDecoration: 'none',
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)'
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)'
+            }}>
+              ← Back to Dashboard
+            </Link>
+            <h1 style={{
+              fontSize: '2.5rem',
+              fontWeight: 800,
+              lineHeight: 1.1,
+              color: 'white',
+              margin: 0
+            }}>
+              Account Settings
+            </h1>
+          </div>
         </div>
 
         {/* Save Message */}

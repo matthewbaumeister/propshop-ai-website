@@ -33,11 +33,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.user) {
-        setUser({
+        const userData = {
           id: session.user.id,
           email: session.user.email!,
-          name: session.user.user_metadata?.name
-        })
+          name: session.user.user_metadata?.name || session.user.user_metadata?.full_name || session.user.email!.split('@')[0]
+        }
+        setUser(userData)
+        console.log('Session restored:', userData) // Debug log
       }
       setLoading(false)
     }
@@ -47,14 +49,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state change:', event, session?.user?.email) // Debug log
         if (session?.user) {
-          setUser({
+          const userData = {
             id: session.user.id,
             email: session.user.email!,
-            name: session.user.user_metadata?.name
-          })
+            name: session.user.user_metadata?.name || session.user.user_metadata?.full_name || session.user.email!.split('@')[0]
+          }
+          setUser(userData)
+          console.log('User state updated:', userData) // Debug log
         } else {
           setUser(null)
+          console.log('User signed out') // Debug log
         }
         setLoading(false)
       }
@@ -75,11 +81,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (data.user) {
-        setUser({
+        const userData = {
           id: data.user.id,
           email: data.user.email!,
-          name: data.user.user_metadata?.name
-        })
+          name: data.user.user_metadata?.name || data.user.user_metadata?.full_name || email.split('@')[0]
+        }
+        setUser(userData)
+        console.log('User signed in:', userData) // Debug log
       }
 
       return {}
@@ -95,13 +103,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password,
         options: {
           data: {
-            name
+            name: name,
+            full_name: name
           }
         }
       })
 
       if (error) {
         return { error: { message: error.message } }
+      }
+
+      // If signup is successful and we have user data, set the user immediately
+      if (data.user) {
+        setUser({
+          id: data.user.id,
+          email: data.user.email!,
+          name: data.user.user_metadata?.name || name
+        })
       }
 
       return {}

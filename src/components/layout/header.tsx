@@ -5,13 +5,16 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useState } from 'react'
 
 export function Header() {
-  const { user, signOut } = useAuth()
+  const { user, signOut, loading } = useAuth()
   const [showUserMenu, setShowUserMenu] = useState(false)
 
   const handleSignOut = async () => {
     await signOut()
     setShowUserMenu(false)
   }
+
+  // Debug: Log user state
+  console.log('Header - User state:', user, 'Loading:', loading)
 
   return (
     <header className="header">
@@ -57,6 +60,13 @@ export function Header() {
           <Link href="/book-demo" className="btn btn-primary">
             Book a Demo →
           </Link>
+          
+          {/* Debug display - temporary */}
+          {loading && (
+            <div style={{ color: '#9AF23A', fontSize: '0.75rem', padding: '0.5rem' }}>
+              Loading auth...
+            </div>
+          )}
           
           {user ? (
             <div className="relative">

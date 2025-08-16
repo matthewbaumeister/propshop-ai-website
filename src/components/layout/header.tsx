@@ -5,12 +5,47 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useState } from 'react'
 
 export function Header() {
-  const { user, signOut } = useAuth()
+  const { user, signOut, loading } = useAuth()
   const [showUserMenu, setShowUserMenu] = useState(false)
+
+  // Debug logging
+  console.log('Header - User state:', user)
+  console.log('Header - User authenticated:', !!user)
+  console.log('Header - Loading state:', loading)
 
   const handleSignOut = async () => {
     await signOut()
     setShowUserMenu(false)
+  }
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <header className="header">
+        <div className="container">
+          <Link href="/" className="brand no-underline">
+            <div className="logo-icon" style={{
+              background: 'none !important',
+              backgroundImage: 'none !important',
+              backgroundSize: 'auto !important'
+            }}>
+              <img 
+                src="/arrow-wall-new.svg" 
+                alt="PropShop AI Logo" 
+                className="w-24 h-24"
+              />
+            </div>
+            <span 
+              className="logo-text text-white no-underline" 
+              style={{ marginLeft: '0.25rem' }}
+            >
+              Prop Shop AI
+            </span>
+          </Link>
+          <div style={{ color: 'white', padding: '1rem' }}>Loading...</div>
+        </div>
+      </header>
+    )
   }
 
   return (

@@ -180,6 +180,35 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+-- Create trigger to automatically create user profile when user signs up
+CREATE OR REPLACE FUNCTION create_user_profile()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO user_profiles (
+        user_id,
+        first_name,
+        last_name,
+        theme_preference,
+        email_notifications,
+        admin_notifications,
+        meeting_notifications
+    ) VALUES (
+        NEW.id,
+        COALESCE(NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1)),
+        NULL,
+        'dark',
+        TRUE,
+        FALSE,
+        FALSE
+    );
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER create_user_profile_trigger
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION create_user_profile();
+
 CREATE TRIGGER update_user_profiles_updated_at
     BEFORE UPDATE ON user_profiles
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

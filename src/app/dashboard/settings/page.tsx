@@ -76,7 +76,7 @@ export default function SettingsPage() {
     }
   }
 
-  const handleSettingChange = (setting: keyof typeof settings, value: any) => {
+  const handleSettingChange = (setting: keyof typeof settings, value: string | boolean) => {
     setSettings(prev => ({
       ...prev,
       [setting]: value

@@ -778,8 +778,8 @@ export default function RootLayout({
           <div className="firework"></div>
         </div>
         
-        <Header />
         <AuthProvider>
+          <Header />
           {children}
         </AuthProvider>
         <Footer />

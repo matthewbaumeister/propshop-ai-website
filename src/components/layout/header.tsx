@@ -8,11 +8,6 @@ export function Header() {
   const { user, signOut, loading } = useAuth()
   const [showUserMenu, setShowUserMenu] = useState(false)
 
-  // Debug logging
-  console.log('Header - User state:', user)
-  console.log('Header - User authenticated:', !!user)
-  console.log('Header - Loading state:', loading)
-
   const handleSignOut = async () => {
     await signOut()
     setShowUserMenu(false)

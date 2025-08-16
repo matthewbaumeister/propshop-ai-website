@@ -25,15 +25,15 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Active Proposals</p>
-                  <p className="text-3xl font-bold text-gray-900">12</p>
+                  <p className="text-3xl font-bold text-gray-900">-</p>
                 </div>
                 <div className="h-12 w-12 rounded-lg bg-blue-100 flex items-center justify-center">
                   <span className="text-2xl">📋</span>
                 </div>
               </div>
               <div className="mt-4 flex items-center">
-                <Badge variant="secondary" className="bg-green-100 text-green-800">
-                  +3 this week
+                <Badge variant="secondary" className="bg-gray-100 text-gray-800">
+                  No data yet
                 </Badge>
               </div>
             </CardContent>
@@ -44,15 +44,15 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Win Rate</p>
-                  <p className="text-3xl font-bold text-gray-900">78%</p>
+                  <p className="text-3xl font-bold text-gray-900">-</p>
                 </div>
                 <div className="h-12 w-12 rounded-lg bg-green-100 flex items-center justify-center">
                   <span className="text-2xl">🎯</span>
                 </div>
               </div>
               <div className="mt-4 flex items-center">
-                <Badge variant="secondary" className="bg-green-100 text-green-800">
-                  +5% from last month
+                <Badge variant="secondary" className="bg-gray-100 text-gray-800">
+                  No data yet
                 </Badge>
               </div>
             </CardContent>
@@ -63,15 +63,15 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Contract Value</p>
-                  <p className="text-3xl font-bold text-gray-900">$2.4M</p>
+                  <p className="text-3xl font-bold text-gray-900">-</p>
                 </div>
                 <div className="h-12 w-12 rounded-lg bg-purple-100 flex items-center justify-center">
                   <span className="text-2xl">💰</span>
                 </div>
               </div>
               <div className="mt-4 flex items-center">
-                <Badge variant="secondary" className="bg-green-100 text-green-800">
-                  +18% from last month
+                <Badge variant="secondary" className="bg-gray-100 text-gray-800">
+                  No data yet
                 </Badge>
               </div>
             </CardContent>
@@ -82,15 +82,15 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Compliance Score</p>
-                  <p className="text-3xl font-bold text-gray-900">96%</p>
+                  <p className="text-3xl font-bold text-gray-900">-</p>
                 </div>
                 <div className="h-12 w-12 rounded-lg bg-orange-100 flex items-center justify-center">
                   <span className="text-2xl">✅</span>
                 </div>
               </div>
               <div className="mt-4 flex items-center">
-                <Badge variant="secondary" className="bg-green-100 text-green-800">
-                  +2% from last month
+                <Badge variant="secondary" className="bg-gray-100 text-gray-800">
+                  No data yet
                 </Badge>
               </div>
             </CardContent>
@@ -104,25 +104,9 @@ export default function DashboardPage() {
               <CardTitle className="text-xl font-bold text-gray-900">Recent Proposals</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {[
-                  { name: "DOD Cybersecurity Contract", agency: "Department of Defense", status: "Under Review", value: "$450K" },
-                  { name: "GSA IT Services", agency: "General Services Administration", status: "Submitted", value: "$320K" },
-                  { name: "VA Medical Equipment", agency: "Veterans Affairs", status: "Won", value: "$180K" },
-                ].map((proposal, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-gray-50">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{proposal.name}</h3>
-                      <p className="text-sm text-gray-600">{proposal.agency}</p>
-                    </div>
-                    <div className="text-right">
-                      <Badge variant={proposal.status === "Won" ? "secondary" : proposal.status === "Under Review" ? "default" : "outline"} className="mb-1">
-                        {proposal.status}
-                      </Badge>
-                      <p className="text-sm font-medium text-gray-900">{proposal.value}</p>
-                    </div>
-                  </div>
-                ))}
+              <div className="text-center py-8 text-gray-500">
+                <p>No proposals yet</p>
+                <p className="text-sm mt-2">Create your first proposal to get started</p>
               </div>
             </CardContent>
           </Card>
@@ -132,25 +116,9 @@ export default function DashboardPage() {
               <CardTitle className="text-xl font-bold text-gray-900">AI Insights</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="p-4 rounded-lg bg-blue-50 border-l-4 border-blue-500">
-                  <h3 className="font-semibold text-blue-900 mb-1">Market Opportunity</h3>
-                  <p className="text-sm text-blue-700">
-                    Cybersecurity contracts in your region expected to increase 25% in next quarter.
-                  </p>
-                </div>
-                <div className="p-4 rounded-lg bg-green-50 border-l-4 border-green-500">
-                  <h3 className="font-semibold text-green-900 mb-1">Proposal Optimization</h3>
-                  <p className="text-sm text-green-700">
-                    AI suggests adding 3 compliance keywords could improve your win rate by 12%.
-                  </p>
-                </div>
-                <div className="p-4 rounded-lg bg-orange-50 border-l-4 border-orange-500">
-                  <h3 className="font-semibold text-orange-900 mb-1">Deadline Alert</h3>
-                  <p className="text-sm text-orange-700">
-                    DOD contract submission deadline in 5 days - compliance review recommended.
-                  </p>
-                </div>
+              <div className="text-center py-8 text-gray-500">
+                <p>No insights yet</p>
+                <p className="text-sm mt-2">AI insights will appear as you use the platform</p>
               </div>
             </CardContent>
           </Card>

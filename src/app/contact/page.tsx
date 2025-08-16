@@ -122,7 +122,7 @@ ${data.message}`
               lineHeight: 1.75,
               marginBottom: '3rem'
             }}>
-              Get in touch and let's discuss how Prop Shop AI can help you win more contracts with AI-powered proposal generation.
+              Get in touch and let&apos;s discuss how Prop Shop AI can help you win more contracts with AI-powered proposal generation.
             </p>
 
             {/* Contact Cards */}
@@ -266,7 +266,7 @@ ${data.message}`
           }}>
             <div style={{ marginBottom: '2rem' }}>
               <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>Contact our team</h2>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Fill out the form and we'll be in touch shortly.</p>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Fill out the form and we&apos;ll be in touch shortly.</p>
             </div>
             
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -492,7 +492,7 @@ ${data.message}`
                   <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                   </svg>
-                  Message sent! We'll get back to you within 24 hours.
+                  Message sent! We&apos;ll get back to you within 24 hours.
                 </div>
               )}
 
@@ -530,7 +530,7 @@ ${data.message}`
                 By contacting us, you agree to our 
                 <a href="/privacy" style={{ color: 'var(--accent-primary)', textDecoration: 'none', transition: 'color 0.3s ease' }}> Privacy Policy</a> and 
                 <a href="/terms" style={{ color: 'var(--accent-primary)', textDecoration: 'none', transition: 'color 0.3s ease' }}> Terms of Service</a>. 
-                We'll use your information to respond to your inquiry and improve our services.
+                We&apos;ll use your information to respond to your inquiry and improve our services.
               </p>
             </div>
           </div>

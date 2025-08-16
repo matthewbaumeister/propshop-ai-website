@@ -1,88 +1,111 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
 
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const supabase = createRouteHandlerClient({ cookies })
+    
+    // Get the current user
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const token = authHeader.substring(7)
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
-    }
-
-    // Get user profile for settings
-    const { data: profile, error: profileError } = await supabase
-      .from('user_profiles')
-      .select('theme_preference, email_notifications, admin_notifications, meeting_notifications')
+    // Get user settings from the database
+    const { data: settings, error: settingsError } = await supabase
+      .from('user_settings')
+      .select('*')
       .eq('user_id', user.id)
       .single()
 
-    if (profileError) {
-      return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+    if (settingsError) {
+      console.error('Error fetching settings:', settingsError)
+      return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 })
     }
 
-    // Return settings in the expected format
+    // Return the settings
     return NextResponse.json({
-      emailNotifications: profile.email_notifications ?? true,
-      pushNotifications: false, // Not implemented yet
-      marketingEmails: false, // Not implemented yet
-      twoFactorAuth: false, // Not implemented yet
-      language: 'en', // Default
-      timezone: 'UTC' // Default
+      emailNotifications: settings.email_notifications,
+      pushNotifications: settings.push_notifications,
+      marketingEmails: settings.marketing_emails,
+      twoFactorAuth: settings.two_factor_auth,
+      language: settings.language,
+      timezone: settings.timezone,
+      themePreference: settings.theme_preference
     })
+
   } catch (error) {
-    console.error('Settings API error:', error)
+    console.error('Error in GET /api/settings:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const supabase = createRouteHandlerClient({ cookies })
+    
+    // Get the current user
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const token = authHeader.substring(7)
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
-    }
-
+    // Parse the request body
     const body = await request.json()
+    
+    // Validate the input
+    const {
+      emailNotifications,
+      pushNotifications,
+      marketingEmails,
+      twoFactorAuth,
+      language,
+      timezone,
+      themePreference
+    } = body
 
-    // Update profile with new settings
-    const { data: profile, error: updateError } = await supabase
-      .from('user_profiles')
-      .update({
-        theme_preference: body.theme_preference || 'dark',
-        email_notifications: body.emailNotifications ?? true,
-        admin_notifications: body.adminNotifications ?? false,
-        meeting_notifications: body.meetingNotifications ?? false
+    // Update user settings in the database
+    const { data: updatedSettings, error: updateError } = await supabase
+      .from('user_settings')
+      .upsert({
+        user_id: user.id,
+        email_notifications: emailNotifications,
+        push_notifications: pushNotifications,
+        marketing_emails: marketingEmails,
+        two_factor_auth: twoFactorAuth,
+        language: language || 'en',
+        timezone: timezone || 'UTC',
+        theme_preference: themePreference || 'dark'
+      }, {
+        onConflict: 'user_id'
       })
-      .eq('user_id', user.id)
       .select()
       .single()
 
     if (updateError) {
       console.error('Error updating settings:', updateError)
-      return NextResponse.json({ error: 'Failed to save settings' }, { status: 500 })
+      return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 })
     }
 
-    return NextResponse.json({ success: true })
+    // Return success response
+    return NextResponse.json({ 
+      message: 'Settings updated successfully',
+      settings: {
+        emailNotifications: updatedSettings.email_notifications,
+        pushNotifications: updatedSettings.push_notifications,
+        marketingEmails: updatedSettings.marketing_emails,
+        twoFactorAuth: updatedSettings.two_factor_auth,
+        language: updatedSettings.language,
+        timezone: updatedSettings.timezone,
+        themePreference: updatedSettings.theme_preference
+      }
+    })
+
   } catch (error) {
-    console.error('Settings API error:', error)
+    console.error('Error in POST /api/settings:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

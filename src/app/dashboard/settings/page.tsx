@@ -64,17 +64,33 @@ export default function SettingsPage() {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) return
 
-      const response = await fetch('/api/settings', {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`
-        }
-      })
+      const response = await fetch('/api/settings')
       if (response.ok) {
         const data = await response.json()
         setSettings(data)
+      } else {
+        console.error('Failed to load settings:', response.status)
+        // Set default settings if none exist
+        setSettings({
+          emailNotifications: true,
+          pushNotifications: false,
+          marketingEmails: false,
+          twoFactorAuth: false,
+          language: 'en',
+          timezone: 'UTC'
+        })
       }
     } catch (error) {
       console.error('Error loading settings:', error)
+      // Set default settings on error
+      setSettings({
+        emailNotifications: true,
+        pushNotifications: false,
+        marketingEmails: false,
+        twoFactorAuth: false,
+        language: 'en',
+        timezone: 'UTC'
+      })
     }
   }
 
@@ -92,8 +108,7 @@ export default function SettingsPage() {
       const response = await fetch('/api/profile', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(profile),
       })
@@ -125,8 +140,7 @@ export default function SettingsPage() {
       const response = await fetch('/api/settings', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(settings),
       })

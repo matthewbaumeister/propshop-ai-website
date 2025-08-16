@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabaseClient'
 
 interface MeetingRequest {
   id: string
@@ -41,7 +42,14 @@ export default function AdminPage() {
 
   const checkAdminStatus = async () => {
     try {
-      const response = await fetch('/api/check-admin')
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+
+      const response = await fetch('/api/check-admin', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
       if (response.ok) {
         const data = await response.json()
         setIsAdmin(data.isAdmin)
@@ -58,15 +66,26 @@ export default function AdminPage() {
 
   const loadAdminData = async () => {
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+
       // Load meeting requests
-      const meetingsResponse = await fetch('/api/admin/meetings')
+      const meetingsResponse = await fetch('/api/admin/meetings', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
       if (meetingsResponse.ok) {
         const meetingsData = await meetingsResponse.json()
         setMeetingRequests(meetingsData)
       }
 
       // Load users
-      const usersResponse = await fetch('/api/admin/users')
+      const usersResponse = await fetch('/api/admin/users', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
       if (usersResponse.ok) {
         const usersData = await usersResponse.json()
         setUsers(usersData)
@@ -78,10 +97,14 @@ export default function AdminPage() {
 
   const handleMeetingStatusChange = async (requestId: string, status: 'approved' | 'rejected') => {
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+
       const response = await fetch(`/api/admin/meetings/${requestId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
         },
         body: JSON.stringify({ status }),
       })

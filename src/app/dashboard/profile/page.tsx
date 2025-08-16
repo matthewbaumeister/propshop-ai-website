@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabaseClient'
 
 interface ProfileData {
   id?: string
@@ -37,7 +38,14 @@ export default function ProfilePage() {
 
   const fetchProfile = async () => {
     try {
-      const response = await fetch('/api/profile')
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+
+      const response = await fetch('/api/profile', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
       if (response.ok) {
         const data = await response.json()
         setProfile(data)
@@ -51,7 +59,14 @@ export default function ProfilePage() {
 
   const checkAdminStatus = async () => {
     try {
-      const response = await fetch('/api/check-admin')
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+
+      const response = await fetch('/api/check-admin', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
       if (response.ok) {
         const data = await response.json()
         setIsAdmin(data.isAdmin)
@@ -66,10 +81,17 @@ export default function ProfilePage() {
     setSaveMessage('')
 
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        setSaveMessage('Not authenticated')
+        return
+      }
+
       const response = await fetch('/api/profile', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
         },
         body: JSON.stringify(profile),
       })

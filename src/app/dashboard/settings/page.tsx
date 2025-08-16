@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabaseClient'
 
 export default function SettingsPage() {
   const { user } = useAuth()
@@ -25,7 +26,14 @@ export default function SettingsPage() {
 
   const loadSettings = async () => {
     try {
-      const response = await fetch('/api/settings')
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+
+      const response = await fetch('/api/settings', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
       if (response.ok) {
         const data = await response.json()
         setSettings(data)
@@ -40,10 +48,17 @@ export default function SettingsPage() {
     setSaveMessage('')
 
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        setSaveMessage('Not authenticated')
+        return
+      }
+
       const response = await fetch('/api/settings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
         },
         body: JSON.stringify(settings),
       })

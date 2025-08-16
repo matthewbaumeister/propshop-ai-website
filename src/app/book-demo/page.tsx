@@ -46,7 +46,7 @@ Primary Time: ${data.primaryTime}
 Message:
 ${data.message}
 
-We'll contact you within 2 hours to confirm your demo slot.`
+        We&apos;ll contact you within 2 hours to confirm your demo slot.`
       
       const mailtoLink = `mailto:info@prop-shop.ai?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
       
@@ -541,7 +541,7 @@ We'll contact you within 2 hours to confirm your demo slot.`
                   color: '#22C55E',
                   textAlign: 'center'
                 }}>
-                  Demo request sent! We'll contact you within 2 hours to confirm.
+                  Demo request sent! We&apos;ll contact you within 2 hours to confirm.
                 </div>
               )}
               

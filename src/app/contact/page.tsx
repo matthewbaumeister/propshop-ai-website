@@ -164,7 +164,7 @@ ${data.message}`
                 <div style={{ flex: 1 }}>
                   <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.25rem', color: 'var(--text-primary)' }}>Email us directly</h3>
                   <p style={{ color: 'var(--accent-secondary)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>info@prop-shop.ai</p>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>We'll respond within 24 hours</p>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>We&apos;ll respond within 24 hours</p>
                 </div>
               </div>
               

@@ -194,7 +194,7 @@ export default function SignInPage() {
             color: '#9CA3AF',
             fontSize: '0.875rem'
           }}>
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/auth/signup" style={{
               color: '#9AF23A',
               textDecoration: 'none',

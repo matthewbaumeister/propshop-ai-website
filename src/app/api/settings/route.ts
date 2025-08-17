@@ -37,6 +37,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 })
     }
 
+    // Check if account is soft deleted
+    if (settings.deleted_at) {
+      return NextResponse.json({ error: 'Account has been deleted' }, { status: 403 })
+    }
+
     // Return the settings
     return NextResponse.json({
       emailNotifications: settings.email_notifications,

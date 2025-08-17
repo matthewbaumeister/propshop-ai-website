@@ -77,6 +77,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (data.user) {
+        // Check if the account has been soft deleted
+        try {
+          const response = await fetch('/api/auth/check-deleted', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email })
+          })
+
+          const checkResult = await response.json()
+          
+          if (checkResult.deleted) {
+            // Sign out the user immediately if account is deleted
+            await supabase.auth.signOut()
+            return { error: { message: 'This account has been deleted and cannot be accessed.' } }
+          }
+        } catch (checkError) {
+          console.error('Error checking account status:', checkError)
+          // Continue with login if we can't check (fallback)
+        }
+
         const userData = {
           id: data.user.id,
           email: data.user.email!,

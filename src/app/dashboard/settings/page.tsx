@@ -946,20 +946,21 @@ export default function SettingsPage() {
             <div style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: '1rem',
+              gap: '1.5rem',
               marginBottom: '2rem'
             }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '1rem',
+                padding: '1.5rem',
                 background: 'rgba(255, 255, 255, 0.05)',
-                borderRadius: '0.5rem'
+                borderRadius: '0.5rem',
+                border: '1px solid rgba(255, 255, 255, 0.1)'
               }}>
                 <div>
-                  <h3 style={{ color: 'white', marginBottom: '0.25rem' }}>Two-Factor Authentication</h3>
-                  <p style={{ color: '#9CA3AF', fontSize: '0.875rem' }}>Add an extra layer of security to your account</p>
+                  <h3 style={{ color: 'white', marginBottom: '0.5rem', fontSize: '1rem', fontWeight: 600 }}>Two-Factor Authentication</h3>
+                  <p style={{ color: '#9CA3AF', fontSize: '0.875rem', margin: 0 }}>Add an extra layer of security to your account</p>
                 </div>
                 <input
                   type="checkbox"
@@ -977,13 +978,14 @@ export default function SettingsPage() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '1rem',
+                padding: '1.5rem',
                 background: 'rgba(255, 255, 255, 0.05)',
-                borderRadius: '0.5rem'
+                borderRadius: '0.5rem',
+                border: '1px solid rgba(255, 255, 255, 0.1)'
               }}>
                 <div>
-                  <h3 style={{ color: 'white', marginBottom: '0.25rem' }}>Session Management</h3>
-                  <p style={{ color: '#9CA3AF', fontSize: '0.875rem' }}>Manage active sessions and device access</p>
+                  <h3 style={{ color: 'white', marginBottom: '0.5rem', fontSize: '1rem', fontWeight: 600 }}>Session Management</h3>
+                  <p style={{ color: '#9CA3AF', fontSize: '0.875rem', margin: 0 }}>Manage active sessions and device access</p>
                 </div>
                 <button
                   onClick={() => {
@@ -1009,14 +1011,14 @@ export default function SettingsPage() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '1rem',
+                padding: '1.5rem',
                 background: 'rgba(255, 122, 41, 0.1)',
                 border: '1px solid rgba(255, 122, 41, 0.3)',
                 borderRadius: '0.5rem',
                 color: '#FF7A29'
               }}>
                 <div>
-                  <h4 style={{ marginBottom: '0.5rem' }}>Password Change</h4>
+                  <h4 style={{ marginBottom: '0.5rem', fontSize: '1rem', fontWeight: 600 }}>Password Change</h4>
                   <p style={{ fontSize: '0.875rem', margin: 0 }}>
                     Update your account password for enhanced security
                   </p>
@@ -1044,7 +1046,7 @@ export default function SettingsPage() {
 
             {/* Delete Account Section */}
             <div style={{
-              marginTop: '2rem',
+              marginTop: '1.5rem',
               padding: '1.5rem',
               background: 'rgba(220, 38, 38, 0.1)',
               border: '1px solid rgba(220, 38, 38, 0.3)',
@@ -1056,7 +1058,7 @@ export default function SettingsPage() {
                 fontSize: '1rem',
                 fontWeight: 600
               }}>
-                🗑️ Delete Account
+                Delete Account
               </h3>
               <p style={{
                 color: '#fca5a5',
@@ -1339,7 +1341,7 @@ export default function SettingsPage() {
                   fontWeight: 700,
                   margin: 0
                 }}>
-                  🗑️ Delete Account
+                  Delete Account
                 </h3>
                 <button
                   onClick={() => setShowDeleteModal(false)}

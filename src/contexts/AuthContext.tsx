@@ -151,7 +151,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           data: {
             name: name,
             full_name: name,
-            profileData: profileData // Store profile data temporarily
+            first_name: profileData?.first_name || name,
+            last_name: profileData?.last_name || '',
+            company: profileData?.company || '',
+            role: profileData?.role || 'user',
+            phone: profileData?.phone || '',
+            bio: profileData?.bio || ''
           }
         }
       })

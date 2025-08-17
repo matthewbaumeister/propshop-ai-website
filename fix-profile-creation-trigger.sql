@@ -25,11 +25,12 @@ BEGIN
         meeting_notifications
     ) VALUES (
         NEW.id,
-        COALESCE(NEW.raw_user_meta_data->>'name', 
+        COALESCE(NEW.raw_user_meta_data->>'first_name',
+                 NEW.raw_user_meta_data->>'name', 
                  NEW.raw_user_meta_data->>'full_name', 
                  split_part(NEW.email, '@', 1)),
-        '', -- last_name (empty but not NULL)
-        '', -- company (empty but not NULL)
+        COALESCE(NEW.raw_user_meta_data->>'last_name', ''), -- last_name from signup
+        COALESCE(NEW.raw_user_meta_data->>'company', ''), -- company from signup
         'user', -- role
         '', -- phone (empty but not NULL)
         '', -- bio (empty but not NULL)

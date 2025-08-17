@@ -43,16 +43,23 @@ export default function SignUpPage() {
       const { error } = await signUp(
         formData.email,
         formData.password,
-        formData.firstName
+        formData.firstName,
+        {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          company: formData.company,
+          role: 'user',
+          phone: '',
+          bio: ''
+        }
       )
 
       if (error) {
         setError(error.message)
       } else {
         setSuccess(true)
-        setTimeout(() => {
-          router.push('/auth/verify-email')
-        }, 2000)
+        // Don't redirect automatically - let user read the success message
+        // They should check their email and click the verification link
       }
     } catch (err) {
       setError('An unexpected error occurred')
@@ -191,14 +198,13 @@ export default function SignUpPage() {
               fontSize: '0.875rem',
               fontWeight: 500
             }}>
-              Last Name *
+              Last Name
             </label>
             <input
               type="text"
               name="lastName"
               value={formData.lastName}
               onChange={handleChange}
-              required
               style={{
                 width: '100%',
                 padding: '0.75rem',
@@ -220,14 +226,13 @@ export default function SignUpPage() {
               fontSize: '0.875rem',
               fontWeight: 500
             }}>
-              Company *
+              Company
             </label>
             <input
               type="text"
               name="company"
               value={formData.company}
               onChange={handleChange}
-              required
               style={{
                 width: '100%',
                 padding: '0.75rem',
@@ -266,7 +271,7 @@ export default function SignUpPage() {
                 color: 'white',
                 fontSize: '1rem'
               }}
-              placeholder="Enter your email"
+              placeholder="Enter your email address"
             />
           </div>
 

@@ -32,21 +32,18 @@ export async function GET(request: NextRequest) {
       .single()
 
     if (profileError) {
-      console.error('Error fetching profile:', profileError)
-      
-      // If profile doesn't exist, create a default one
       if (profileError.code === 'PGRST116') {
+        // No profile found, create a default one
         const { data: newProfile, error: createError } = await supabase
           .from('user_profiles')
           .insert({
             user_id: user.id,
-            first_name: user.user_metadata?.name || user.email?.split('@')[0] || '',
+            first_name: user.user_metadata?.name || user.user_metadata?.full_name || user.email!.split('@')[0],
             last_name: '',
             company: '',
             role: 'user',
             phone: '',
             bio: '',
-            is_admin: false,
             theme_preference: 'dark',
             email_notifications: true,
             admin_notifications: false,
@@ -56,14 +53,20 @@ export async function GET(request: NextRequest) {
           .single()
 
         if (createError) {
-          console.error('Error creating profile:', createError)
-          return NextResponse.json({ error: 'Failed to create profile' }, { status: 500 })
+          console.error('Error creating default profile:', createError)
+          return NextResponse.json({ error: 'Failed to create default profile' }, { status: 500 })
+        }
+
+        // Check if account is soft deleted
+        if (newProfile.deleted_at) {
+          return NextResponse.json({ error: 'Account has been deleted' }, { status: 403 })
         }
 
         return NextResponse.json(newProfile)
+      } else {
+        console.error('Error fetching profile:', profileError)
+        return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 })
       }
-      
-      return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 })
     }
 
     // Check if account is soft deleted
@@ -180,10 +183,11 @@ export async function DELETE(request: NextRequest) {
       // Continue even if sign out fails
     }
 
+    // Return success response
     return NextResponse.json({ 
-      message: 'Account deleted successfully. You will not be able to sign in again.',
-      deleted: true
+      message: 'Account deleted successfully'
     })
+
   } catch (error) {
     console.error('Error in DELETE /api/profile:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

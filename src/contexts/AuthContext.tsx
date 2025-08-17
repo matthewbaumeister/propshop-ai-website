@@ -9,12 +9,23 @@ interface User {
   name?: string
 }
 
+interface ProfileData {
+  first_name?: string
+  last_name?: string
+  company?: string
+  role?: string
+  phone?: string
+  bio?: string
+  theme_preference?: string
+}
+
 interface AuthContextType {
   user: User | null
-  signIn: (email: string, password: string) => Promise<{ error?: { message: string } }>
-  signUp: (email: string, password: string, name: string) => Promise<{ error?: { message: string } }>
+  signIn: (email: string, password: string) => Promise<{ error?: { message: string; requiresSignUp?: boolean; requiresVerification?: boolean } }>
+  signUp: (email: string, password: string, name: string, profileData?: ProfileData) => Promise<{ error?: { message: string } }>
   signOut: () => Promise<void>
   loading: boolean
+  saveProfileAfterVerification: (profileData: ProfileData) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -32,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Check for existing session
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
-      if (session?.user) {
+      if (session?.user && session.user.email_confirmed_at) {
         const userData = {
           id: session.user.id,
           email: session.user.email!,
@@ -48,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (session?.user) {
+        if (session?.user && session.user.email_confirmed_at) {
           const userData = {
             id: session.user.id,
             email: session.user.email!,
@@ -104,21 +115,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // Continue with login if we can't check (fallback)
         }
 
-        const userData = {
-          id: data.user.id,
-          email: data.user.email!,
-          name: data.user.user_metadata?.name || data.user.user_metadata?.full_name || email.split('@')[0]
+        // Only set user if email is confirmed
+        if (data.user.email_confirmed_at) {
+          const userData = {
+            id: data.user.id,
+            email: data.user.email!,
+            name: data.user.user_metadata?.name || data.user.user_metadata?.full_name || email.split('@')[0]
+          }
+          setUser(userData)
+        } else {
+          // Email not confirmed - sign them out and show error
+          await supabase.auth.signOut()
+          return { 
+            error: { 
+              message: 'Please check your email and click the verification link before signing in.',
+              requiresVerification: true
+            } 
+          }
         }
-        setUser(userData)
       }
 
       return {}
     } catch (error) {
+      console.error('Sign in error:', error)
       return { error: { message: 'An unexpected error occurred' } }
     }
   }
 
-  const signUp = async (email: string, password: string, name: string) => {
+  const signUp = async (email: string, password: string, name: string, profileData?: ProfileData) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -126,7 +150,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         options: {
           data: {
             name: name,
-            full_name: name
+            full_name: name,
+            profileData: profileData // Store profile data temporarily
           }
         }
       })
@@ -135,18 +160,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: { message: error.message } }
       }
 
-      // If signup is successful and we have user data, set the user immediately
-      if (data.user) {
-        setUser({
-          id: data.user.id,
-          email: data.user.email!,
-          name: data.user.user_metadata?.name || name
-        })
-      }
+      // Don't set user immediately - they need to verify email first
+      // The user will only be set after email verification is complete
+      // This prevents them from being "logged in" before verification
 
       return {}
     } catch (error) {
+      console.error('Sign up error:', error)
       return { error: { message: 'An unexpected error occurred' } }
+    }
+  }
+
+  const saveProfileAfterVerification = async (profileData: ProfileData) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user) return
+
+      const response = await fetch('/api/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify(profileData)
+      })
+
+      if (!response.ok) {
+        console.error('Failed to save profile after verification:', response.statusText)
+      }
+    } catch (error) {
+      console.error('Error saving profile after verification:', error)
     }
   }
 
@@ -164,7 +207,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signIn,
     signUp,
     signOut,
-    loading
+    loading,
+    saveProfileAfterVerification
   }
 
   return (
@@ -183,7 +227,8 @@ export function useAuth() {
       signIn: async () => ({ error: { message: 'Not available during build' } }),
       signUp: async () => ({ error: { message: 'Not available during build' } }),
       signOut: async () => {},
-      loading: false
+      loading: false,
+      saveProfileAfterVerification: async () => {}
     }
   }
   return context

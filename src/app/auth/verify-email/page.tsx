@@ -4,12 +4,14 @@ import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabaseClient'
+import { useAuth } from '@/contexts/AuthContext'
 
 function VerifyEmailContent() {
   const [verificationStatus, setVerificationStatus] = useState<'verifying' | 'success' | 'error' | 'expired'>('verifying')
   const [errorMessage, setErrorMessage] = useState('')
   const searchParams = useSearchParams()
   const router = useRouter()
+  const { saveProfileAfterVerification } = useAuth()
 
   useEffect(() => {
     const verifyEmail = async () => {
@@ -39,6 +41,12 @@ function VerifyEmailContent() {
             setErrorMessage(error.message || 'Verification failed. Please try again.')
           }
         } else {
+          // Get the user's profile data from metadata and save it
+          const { data: { session } } = await supabase.auth.getSession()
+          if (session?.user?.user_metadata?.profileData) {
+            await saveProfileAfterVerification(session.user.user_metadata.profileData)
+          }
+
           setVerificationStatus('success')
           // Redirect to dashboard after a short delay
           setTimeout(() => {
@@ -53,7 +61,7 @@ function VerifyEmailContent() {
     }
 
     verifyEmail()
-  }, [searchParams, router])
+  }, [searchParams, router, saveProfileAfterVerification])
 
   const resendVerification = async () => {
     try {
@@ -325,7 +333,7 @@ function VerifyEmailContent() {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
           }
-        `}        </style>
+        `}</style>
       </div>
     </div>
   )

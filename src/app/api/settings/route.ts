@@ -33,8 +33,42 @@ export async function GET(request: NextRequest) {
       .single()
 
     if (settingsError) {
-      console.error('Error fetching settings:', settingsError)
-      return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 })
+      if (settingsError.code === 'PGRST116') {
+        // No settings found, create default settings
+        const { data: newSettings, error: createError } = await supabase
+          .from('user_settings')
+          .insert({
+            user_id: user.id,
+            email_notifications: true,
+            push_notifications: false,
+            marketing_emails: false,
+            two_factor_auth: false,
+            language: 'en',
+            timezone: 'UTC',
+            theme_preference: 'dark'
+          })
+          .select()
+          .single()
+
+        if (createError) {
+          console.error('Error creating default settings:', createError)
+          return NextResponse.json({ error: 'Failed to create default settings' }, { status: 500 })
+        }
+
+        // Return the newly created default settings
+        return NextResponse.json({
+          emailNotifications: newSettings.email_notifications,
+          pushNotifications: newSettings.push_notifications,
+          marketingEmails: newSettings.marketing_emails,
+          twoFactorAuth: newSettings.two_factor_auth,
+          language: newSettings.language,
+          timezone: newSettings.timezone,
+          themePreference: newSettings.theme_preference
+        })
+      } else {
+        console.error('Error fetching settings:', settingsError)
+        return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 })
+      }
     }
 
     // Check if account is soft deleted

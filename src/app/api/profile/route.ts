@@ -66,6 +66,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 })
     }
 
+    // Check if account is soft deleted
+    if (profile.deleted_at) {
+      return NextResponse.json({ error: 'Account has been deleted' }, { status: 403 })
+    }
+
     // Return the profile
     return NextResponse.json(profile)
 
@@ -159,33 +164,26 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Delete user profile
-    const { error: profileError } = await supabase
-      .from('user_profiles')
-      .delete()
-      .eq('user_id', user.id)
+    // Soft delete user account using the database function
+    const { data: softDeleteResult, error: softDeleteError } = await supabase
+      .rpc('soft_delete_user', { user_uuid: user.id })
 
-    if (profileError) {
-      console.error('Error deleting profile:', profileError)
-      return NextResponse.json({ error: 'Failed to delete profile' }, { status: 500 })
+    if (softDeleteError) {
+      console.error('Error soft deleting user:', softDeleteError)
+      return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 })
     }
 
-    // Delete user settings
-    const { error: settingsError } = await supabase
-      .from('user_settings')
-      .delete()
-      .eq('user_id', user.id)
-
-    if (settingsError) {
-      console.error('Error deleting settings:', settingsError)
-      // Continue even if settings deletion fails
+    // Sign out the user from Supabase Auth
+    const { error: signOutError } = await supabase.auth.signOut()
+    if (signOutError) {
+      console.error('Error signing out user:', signOutError)
+      // Continue even if sign out fails
     }
 
-    // Note: We cannot delete the user from Supabase Auth from this API route
-    // as we don't have admin privileges. The user will need to delete their account
-    // from the Supabase dashboard or through a separate admin process.
-
-    return NextResponse.json({ message: 'Account data deleted successfully' })
+    return NextResponse.json({ 
+      message: 'Account deleted successfully. You will not be able to sign in again.',
+      deleted: true
+    })
   } catch (error) {
     console.error('Error in DELETE /api/profile:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

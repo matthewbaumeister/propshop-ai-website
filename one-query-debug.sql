@@ -1,177 +1,77 @@
--- Array-Based Debug - Shows everything in one result without UNION ALL
+-- Simple Fix Script - Fix the signup issue directly
 -- Run this in your Supabase SQL Editor
 
--- This approach uses arrays to combine results without UNION ALL syntax
+-- Since your SQL Editor can't handle complex queries, let's just run the fix directly
 
-SELECT 
-    unnest(ARRAY[
-        'EXISTING TABLES',
-        'USER_PROFILES CONTENT', 
-        'USER_SETTINGS CONTENT',
-        'AUTH.USERS CONTENT',
-        'EXISTING FUNCTIONS',
-        'EXISTING TRIGGERS',
-        'EXISTING RLS POLICIES'
-    ]) as section,
-    
-    CASE 
-        WHEN unnest(ARRAY[
-            'EXISTING TABLES',
-            'USER_PROFILES CONTENT', 
-            'USER_SETTINGS CONTENT',
-            'AUTH.USERS CONTENT',
-            'EXISTING FUNCTIONS',
-            'EXISTING TRIGGERS',
-            'EXISTING RLS POLICIES'
-        ]) = 'EXISTING TABLES' THEN
-            (SELECT string_agg(table_name, ', ') FROM information_schema.tables 
-             WHERE table_schema IN ('public', 'auth') 
-             AND table_name IN ('user_profiles', 'user_settings', 'users'))
-        WHEN unnest(ARRAY[
-            'EXISTING TABLES',
-            'USER_PROFILES CONTENT', 
-            'USER_SETTINGS CONTENT',
-            'AUTH.USERS CONTENT',
-            'EXISTING FUNCTIONS',
-            'EXISTING TRIGGERS',
-            'EXISTING RLS POLICIES'
-        ]) = 'USER_PROFILES CONTENT' THEN
-            (SELECT string_agg(COALESCE(first_name, 'No Name'), ', ') FROM user_profiles LIMIT 3)
-        WHEN unnest(ARRAY[
-            'EXISTING TABLES',
-            'USER_PROFILES CONTENT', 
-            'USER_SETTINGS CONTENT',
-            'AUTH.USERS CONTENT',
-            'EXISTING FUNCTIONS',
-            'EXISTING TRIGGERS',
-            'EXISTING RLS POLICIES'
-        ]) = 'USER_SETTINGS CONTENT' THEN
-            (SELECT string_agg(COALESCE(theme_preference, 'No Theme'), ', ') FROM user_settings LIMIT 3)
-        WHEN unnest(ARRAY[
-            'EXISTING TABLES',
-            'USER_PROFILES CONTENT', 
-            'USER_SETTINGS CONTENT',
-            'AUTH.USERS CONTENT',
-            'EXISTING FUNCTIONS',
-            'EXISTING TRIGGERS',
-            'EXISTING RLS POLICIES'
-        ]) = 'AUTH.USERS CONTENT' THEN
-            (SELECT string_agg(COALESCE(email, 'No Email'), ', ') FROM auth.users 
-             WHERE email LIKE '%matt%' OR email LIKE '%make-ready%' LIMIT 3)
-        WHEN unnest(ARRAY[
-            'EXISTING TABLES',
-            'USER_PROFILES CONTENT', 
-            'USER_SETTINGS CONTENT',
-            'AUTH.USERS CONTENT',
-            'EXISTING FUNCTIONS',
-            'EXISTING TRIGGERS',
-            'EXISTING RLS POLICIES'
-        ]) = 'EXISTING FUNCTIONS' THEN
-            (SELECT string_agg(routine_name, ', ') FROM information_schema.routines 
-             WHERE routine_name LIKE '%profile%' OR routine_name LIKE '%user%' LIMIT 5)
-        WHEN unnest(ARRAY[
-            'EXISTING TABLES',
-            'USER_PROFILES CONTENT', 
-            'USER_SETTINGS CONTENT',
-            'AUTH.USERS CONTENT',
-            'EXISTING FUNCTIONS',
-            'EXISTING TRIGGERS',
-            'EXISTING RLS POLICIES'
-        ]) = 'EXISTING TRIGGERS' THEN
-            (SELECT string_agg(trigger_name, ', ') FROM information_schema.triggers 
-             WHERE event_object_table IN ('auth.users', 'users') LIMIT 5)
-        WHEN unnest(ARRAY[
-            'EXISTING TABLES',
-            'USER_PROFILES CONTENT', 
-            'USER_SETTINGS CONTENT',
-            'AUTH.USERS CONTENT',
-            'EXISTING FUNCTIONS',
-            'EXISTING TRIGGERS',
-            'EXISTING RLS POLICIES'
-        ]) = 'EXISTING RLS POLICIES' THEN
-            (SELECT string_agg(policyname, ', ') FROM pg_policies 
-             WHERE tablename IN ('user_profiles', 'user_settings') LIMIT 5)
-    END as detail_1,
-    
-    CASE 
-        WHEN unnest(ARRAY[
-            'EXISTING TABLES',
-            'USER_PROFILES CONTENT', 
-            'USER_SETTINGS CONTENT',
-            'AUTH.USERS CONTENT',
-            'EXISTING FUNCTIONS',
-            'EXISTING TRIGGERS',
-            'EXISTING RLS POLICIES'
-        ]) = 'EXISTING TABLES' THEN
-            (SELECT string_agg(table_schema, ', ') FROM information_schema.tables 
-             WHERE table_schema IN ('public', 'auth') 
-             AND table_name IN ('user_profiles', 'user_settings', 'users'))
-        WHEN unnest(ARRAY[
-            'EXISTING TABLES',
-            'USER_PROFILES CONTENT', 
-            'USER_SETTINGS CONTENT',
-            'AUTH.USERS CONTENT',
-            'EXISTING FUNCTIONS',
-            'EXISTING TRIGGERS',
-            'EXISTING RLS POLICIES'
-        ]) = 'USER_PROFILES CONTENT' THEN
-            (SELECT string_agg(COALESCE(last_name, 'No Last Name'), ', ') FROM user_profiles LIMIT 3)
-        WHEN unnest(ARRAY[
-            'EXISTING TABLES',
-            'USER_PROFILES CONTENT', 
-            'USER_SETTINGS CONTENT',
-            'AUTH.USERS CONTENT',
-            'EXISTING FUNCTIONS',
-            'EXISTING TRIGGERS',
-            'EXISTING RLS POLICIES'
-        ]) = 'USER_SETTINGS CONTENT' THEN
-            (SELECT string_agg(COALESCE(email_notifications::text, 'No Email Notifications'), ', ') FROM user_settings LIMIT 3)
-        WHEN unnest(ARRAY[
-            'EXISTING TABLES',
-            'USER_PROFILES CONTENT', 
-            'USER_SETTINGS CONTENT',
-            'AUTH.USERS CONTENT',
-            'EXISTING FUNCTIONS',
-            'EXISTING TRIGGERS',
-            'EXISTING RLS POLICIES'
-        ]) = 'AUTH.USERS CONTENT' THEN
-            (SELECT string_agg(COALESCE(created_at::text, 'No Created At'), ', ') FROM auth.users 
-             WHERE email LIKE '%matt%' OR email LIKE '%make-ready%' LIMIT 3)
-        WHEN unnest(ARRAY[
-            'EXISTING TABLES',
-            'USER_PROFILES CONTENT', 
-            'USER_SETTINGS CONTENT',
-            'AUTH.USERS CONTENT',
-            'EXISTING FUNCTIONS',
-            'EXISTING TRIGGERS',
-            'EXISTING RLS POLICIES'
-        ]) = 'EXISTING FUNCTIONS' THEN
-            (SELECT string_agg(routine_type, ', ') FROM information_schema.routines 
-             WHERE routine_name LIKE '%profile%' OR routine_name LIKE '%user%' LIMIT 5)
-        WHEN unnest(ARRAY[
-            'EXISTING TABLES',
-            'USER_PROFILES CONTENT', 
-            'USER_SETTINGS CONTENT',
-            'AUTH.USERS CONTENT',
-            'EXISTING FUNCTIONS',
-            'EXISTING TRIGGERS',
-            'EXISTING RLS POLICIES'
-        ]) = 'EXISTING TRIGGERS' THEN
-            (SELECT string_agg(event_object_table, ', ') FROM information_schema.triggers 
-             WHERE event_object_table IN ('auth.users', 'users') LIMIT 5)
-        WHEN unnest(ARRAY[
-            'EXISTING TABLES',
-            'USER_PROFILES CONTENT', 
-            'USER_SETTINGS CONTENT',
-            'AUTH.USERS CONTENT',
-            'EXISTING FUNCTIONS',
-            'EXISTING TRIGGERS',
-            'EXISTING RLS POLICIES'
-        ]) = 'EXISTING RLS POLICIES' THEN
-            (SELECT string_agg(cmd, ', ') FROM pg_policies 
-             WHERE tablename IN ('user_profiles', 'user_settings') LIMIT 5)
-    END as detail_2,
-    
-    NULL as detail_3
+-- Step 1: Drop the problematic triggers that reference the non-existent 'users' table
+DROP TRIGGER IF EXISTS create_admin_users_trigger ON users;
+DROP TRIGGER IF EXISTS create_user_profile_trigger ON users;
+DROP TRIGGER IF EXISTS on_auth_user_created ON users;
+DROP TRIGGER IF EXISTS on_auth_user_created_profile ON users;
 
-ORDER BY section;
+-- Step 2: Create the correct trigger on auth.users for profile creation
+CREATE OR REPLACE FUNCTION create_user_profile_on_signup()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Create user profile
+    INSERT INTO user_profiles (
+        user_id,
+        first_name,
+        last_name,
+        company,
+        role,
+        phone,
+        bio,
+        is_admin,
+        theme_preference,
+        email_notifications,
+        admin_notifications,
+        meeting_notifications
+    ) VALUES (
+        NEW.id,
+        COALESCE(NEW.raw_user_meta_data->>'first_name', ''),
+        COALESCE(NEW.raw_user_meta_data->>'last_name', ''),
+        COALESCE(NEW.raw_user_meta_data->>'company', ''),
+        'user',
+        '',
+        '',
+        FALSE,
+        'dark',
+        TRUE,
+        FALSE,
+        FALSE
+    );
+    
+    -- Create user settings
+    INSERT INTO user_settings (
+        user_id,
+        theme_preference,
+        email_notifications,
+        push_notifications,
+        marketing_emails,
+        two_factor_auth,
+        language,
+        timezone
+    ) VALUES (
+        NEW.id,
+        'dark',
+        TRUE,
+        FALSE,
+        FALSE,
+        FALSE,
+        'en',
+        'UTC'
+    );
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Step 3: Create the trigger on auth.users
+CREATE TRIGGER create_user_profile_on_signup
+    AFTER INSERT ON auth.users
+    FOR EACH ROW
+    EXECUTE FUNCTION create_user_profile_on_signup();
+
+-- Step 4: Verify the trigger was created
+SELECT 'TRIGGER CREATED SUCCESSFULLY!' as status;

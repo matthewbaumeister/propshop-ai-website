@@ -144,25 +144,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, firstName: string, profileData?: ProfileData) => {
     try {
+      // Debug: Log what we're sending
+      const userData = {
+        name: firstName,
+        full_name: firstName,
+        first_name: profileData?.first_name || firstName,
+        last_name: profileData?.last_name || '',
+        company: profileData?.company || '',
+        role: profileData?.role || 'user',
+        phone: profileData?.phone || '',
+        bio: profileData?.bio || ''
+      };
+      
+      console.log('SignUp - Sending data to Supabase:', userData);
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: {
-            name: firstName,
-            full_name: firstName,
-            first_name: profileData?.first_name || firstName,
-            last_name: profileData?.last_name || '',
-            company: profileData?.company || '',
-            role: profileData?.role || 'user',
-            phone: profileData?.phone || '',
-            bio: profileData?.bio || ''
-          }
+          data: userData
         }
       })
 
       if (error) {
+        console.error('SignUp - Supabase error:', error);
         return { error: { message: error.message } }
+      }
+
+      // Debug: Log what Supabase returned
+      console.log('SignUp - Supabase response:', data);
+      if (data.user) {
+        console.log('SignUp - User metadata:', data.user.user_metadata);
       }
 
       // Don't set user immediately - they need to verify email first

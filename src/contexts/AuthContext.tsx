@@ -22,7 +22,7 @@ interface ProfileData {
 interface AuthContextType {
   user: User | null
   signIn: (email: string, password: string) => Promise<{ error?: { message: string; requiresSignUp?: boolean; requiresVerification?: boolean } }>
-  signUp: (email: string, password: string, name: string, profileData?: ProfileData) => Promise<{ error?: { message: string } }>
+  signUp: (email: string, password: string, firstName: string, profileData?: ProfileData) => Promise<{ error?: { message: string } }>
   signOut: () => Promise<void>
   loading: boolean
   saveProfileAfterVerification: (profileData: ProfileData) => Promise<void>
@@ -142,16 +142,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const signUp = async (email: string, password: string, name: string, profileData?: ProfileData) => {
+  const signUp = async (email: string, password: string, firstName: string, profileData?: ProfileData) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            name: name,
-            full_name: name,
-            first_name: profileData?.first_name || name,
+            name: firstName,
+            full_name: firstName,
+            first_name: profileData?.first_name || firstName,
             last_name: profileData?.last_name || '',
             company: profileData?.company || '',
             role: profileData?.role || 'user',

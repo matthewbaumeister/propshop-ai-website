@@ -55,11 +55,36 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (user) {
+      // Clear any old deleted records first
+      clearOldDeletedRecords()
       loadProfile()
       loadSettings()
       checkEmailVerification()
     }
   }, [user])
+
+  const clearOldDeletedRecords = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user) return
+
+      // Clear any old deleted records for this user
+      await supabase
+        .from('user_profiles')
+        .update({ deleted_at: null })
+        .eq('user_id', session.user.id)
+        .not('deleted_at', 'is', null)
+
+      await supabase
+        .from('user_settings')
+        .update({ deleted_at: null })
+        .eq('user_id', session.user.id)
+        .not('deleted_at', 'is', null)
+
+    } catch (error) {
+      console.error('Error clearing old deleted records:', error)
+    }
+  }
 
   const loadProfile = async () => {
     try {
@@ -97,10 +122,10 @@ export default function SettingsPage() {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session?.user) return
 
-      // Create a new profile directly in the database
+      // Try to upsert (insert or update) the profile to handle conflicts
       const { data: newProfile, error } = await supabase
         .from('user_profiles')
-        .insert({
+        .upsert({
           user_id: session.user.id,
           first_name: session.user.user_metadata?.name || session.user.user_metadata?.full_name || session.user.email!.split('@')[0],
           last_name: '',
@@ -111,28 +136,45 @@ export default function SettingsPage() {
           theme_preference: 'dark',
           email_notifications: true,
           admin_notifications: false,
-          meeting_notifications: false
+          meeting_notifications: false,
+          deleted_at: null // Ensure it's not marked as deleted
+        }, {
+          onConflict: 'user_id'
         })
         .select()
         .single()
 
       if (error) {
-        console.error('Error creating new profile:', error)
-        // Set default profile data even if creation fails
-        const defaultProfile = {
-          first_name: session.user.user_metadata?.name || session.user.user_metadata?.full_name || session.user.email!.split('@')[0],
-          last_name: '',
-          company: '',
-          role: 'user',
-          phone: '',
-          bio: '',
-          theme_preference: 'dark' as const,
-          email_notifications: true,
-          admin_notifications: false,
-          meeting_notifications: false
+        console.error('Error upserting profile:', error)
+        // If there's still an error, try to get the existing profile
+        const { data: existingProfile, error: fetchError } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .single()
+
+        if (fetchError) {
+          console.error('Error fetching existing profile:', fetchError)
+          // Set default profile data as fallback
+          const defaultProfile = {
+            first_name: session.user.user_metadata?.name || session.user.user_metadata?.full_name || session.user.email!.split('@')[0],
+            last_name: '',
+            company: '',
+            role: 'user',
+            phone: '',
+            bio: '',
+            theme_preference: 'dark' as const,
+            email_notifications: true,
+            admin_notifications: false,
+            meeting_notifications: false
+          }
+          setProfile(defaultProfile)
+          setOriginalProfile(defaultProfile)
+        } else {
+          // Use existing profile data
+          setProfile(existingProfile)
+          setOriginalProfile(existingProfile)
         }
-        setProfile(defaultProfile)
-        setOriginalProfile(defaultProfile)
       } else {
         setProfile(newProfile)
         setOriginalProfile(newProfile)
@@ -191,10 +233,10 @@ export default function SettingsPage() {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session?.user) return
 
-      // Try to create default settings in the database
+      // Try to upsert default settings to handle conflicts
       const { data: newSettings, error } = await supabase
         .from('user_settings')
-        .insert({
+        .upsert({
           user_id: session.user.id,
           email_notifications: true,
           push_notifications: false,
@@ -203,12 +245,37 @@ export default function SettingsPage() {
           language: 'en',
           timezone: 'UTC',
           theme_preference: 'dark'
+        }, {
+          onConflict: 'user_id'
         })
         .select()
         .single()
 
       if (error) {
-        console.error('Error creating default settings:', error)
+        console.error('Error upserting default settings:', error)
+        // Try to get existing settings
+        const { data: existingSettings, error: fetchError } = await supabase
+          .from('user_settings')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .single()
+
+        if (fetchError) {
+          console.error('Error fetching existing settings:', fetchError)
+        } else if (existingSettings) {
+          // Use existing settings data
+          const mappedSettings = {
+            emailNotifications: existingSettings.email_notifications || true,
+            pushNotifications: existingSettings.push_notifications || false,
+            marketingEmails: existingSettings.marketing_emails || false,
+            twoFactorAuth: existingSettings.two_factor_auth || false,
+            language: existingSettings.language || 'en',
+            timezone: existingSettings.timezone || 'UTC'
+          }
+          setSettings(mappedSettings)
+          setOriginalSettings(mappedSettings)
+          return
+        }
       }
 
       // Set default settings regardless of database creation success

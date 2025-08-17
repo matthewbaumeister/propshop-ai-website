@@ -68,18 +68,28 @@ export default function SettingsPage() {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session?.user) return
 
-      // Clear any old deleted records for this user
-      await supabase
-        .from('user_profiles')
-        .update({ deleted_at: null })
-        .eq('user_id', session.user.id)
-        .not('deleted_at', 'is', null)
+      // Clear any old deleted records for this user (only if tables have deleted_at column)
+      try {
+        await supabase
+          .from('user_profiles')
+          .update({ deleted_at: null })
+          .eq('user_id', session.user.id)
+          .not('deleted_at', 'is', null)
+      } catch (error) {
+        // Column might not exist yet, ignore error
+        console.log('deleted_at column not available yet')
+      }
 
-      await supabase
-        .from('user_settings')
-        .update({ deleted_at: null })
-        .eq('user_id', session.user.id)
-        .not('deleted_at', 'is', null)
+      try {
+        await supabase
+          .from('user_settings')
+          .update({ deleted_at: null })
+          .eq('user_id', session.user.id)
+          .not('deleted_at', 'is', null)
+      } catch (error) {
+        // Column might not exist yet, ignore error
+        console.log('deleted_at column not available yet')
+      }
 
     } catch (error) {
       console.error('Error clearing old deleted records:', error)
@@ -91,24 +101,21 @@ export default function SettingsPage() {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) return
 
-      const response = await fetch('/api/profile', {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`
-        }
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        setProfile(data)
-        setOriginalProfile(data) // Store original values for change detection
-      } else if (response.status === 403) {
-        // Profile might be marked as deleted, try to create a new one
-        console.log('Profile access denied, attempting to create new profile...')
-        await createNewProfile()
-      } else {
-        console.error('Failed to load profile:', response.status)
+      // Try to load profile directly from Supabase first
+      const { data: profile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .single()
+
+      if (profileError) {
+        console.error('Error loading profile:', profileError)
         // Try to create a default profile
         await createNewProfile()
+      } else {
+        console.log('Profile loaded successfully:', profile)
+        setProfile(profile)
+        setOriginalProfile(profile) // Store original values for change detection
       }
     } catch (error) {
       console.error('Error loading profile:', error)
@@ -123,61 +130,100 @@ export default function SettingsPage() {
       if (!session?.user) return
 
       // Try to upsert (insert or update) the profile to handle conflicts
-      const { data: newProfile, error } = await supabase
-        .from('user_profiles')
-        .upsert({
-          user_id: session.user.id,
+      const profileData = {
+        user_id: session.user.id,
+        first_name: session.user.user_metadata?.name || session.user.user_metadata?.full_name || session.user.email!.split('@')[0],
+        last_name: '',
+        company: '',
+        role: 'user',
+        phone: '',
+        bio: '',
+        theme_preference: 'dark',
+        email_notifications: true,
+        admin_notifications: false,
+        meeting_notifications: false
+      }
+
+      // Try to upsert with deleted_at first (if column exists)
+      try {
+        const { data: newProfile, error } = await supabase
+          .from('user_profiles')
+          .upsert({
+            ...profileData,
+            deleted_at: null
+          }, {
+            onConflict: 'user_id'
+          })
+          .select()
+          .single()
+
+        if (error) {
+          console.error('Error upserting profile with deleted_at:', error)
+          // Try without deleted_at field
+          const { data: newProfileWithoutDeleted, error: error2 } = await supabase
+            .from('user_profiles')
+            .upsert(profileData, {
+              onConflict: 'user_id'
+            })
+            .select()
+            .single()
+
+          if (error2) {
+            console.error('Error upserting profile without deleted_at:', error2)
+            // If there's still an error, try to get the existing profile
+            const { data: existingProfile, error: fetchError } = await supabase
+              .from('user_profiles')
+              .select('*')
+              .eq('user_id', session.user.id)
+              .single()
+
+            if (fetchError) {
+              console.error('Error fetching existing profile:', fetchError)
+              // Set default profile data as fallback
+              const defaultProfile = {
+                first_name: session.user.user_metadata?.name || session.user.user_metadata?.full_name || session.user.email!.split('@')[0],
+                last_name: '',
+                company: '',
+                role: 'user',
+                phone: '',
+                bio: '',
+                theme_preference: 'dark' as const,
+                email_notifications: true,
+                admin_notifications: false,
+                meeting_notifications: false
+              }
+              setProfile(defaultProfile)
+              setOriginalProfile(defaultProfile)
+            } else {
+              // Use existing profile data
+              setProfile(existingProfile)
+              setOriginalProfile(existingProfile)
+            }
+          } else {
+            setProfile(newProfileWithoutDeleted)
+            setOriginalProfile(newProfileWithoutDeleted)
+          }
+        } else {
+          setProfile(newProfile)
+          setOriginalProfile(newProfile)
+        }
+      } catch (error) {
+        console.error('Error in createNewProfile:', error)
+        // Set default profile data as fallback
+        const defaultProfile = {
           first_name: session.user.user_metadata?.name || session.user.user_metadata?.full_name || session.user.email!.split('@')[0],
           last_name: '',
           company: '',
           role: 'user',
           phone: '',
           bio: '',
-          theme_preference: 'dark',
+          theme_preference: 'dark' as const,
           email_notifications: true,
           admin_notifications: false,
-          meeting_notifications: false,
-          deleted_at: null // Ensure it's not marked as deleted
-        }, {
-          onConflict: 'user_id'
-        })
-        .select()
-        .single()
-
-      if (error) {
-        console.error('Error upserting profile:', error)
-        // If there's still an error, try to get the existing profile
-        const { data: existingProfile, error: fetchError } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .single()
-
-        if (fetchError) {
-          console.error('Error fetching existing profile:', fetchError)
-          // Set default profile data as fallback
-          const defaultProfile = {
-            first_name: session.user.user_metadata?.name || session.user.user_metadata?.full_name || session.user.email!.split('@')[0],
-            last_name: '',
-            company: '',
-            role: 'user',
-            phone: '',
-            bio: '',
-            theme_preference: 'dark' as const,
-            email_notifications: true,
-            admin_notifications: false,
-            meeting_notifications: false
-          }
-          setProfile(defaultProfile)
-          setOriginalProfile(defaultProfile)
-        } else {
-          // Use existing profile data
-          setProfile(existingProfile)
-          setOriginalProfile(existingProfile)
+          meeting_notifications: false
         }
-      } else {
-        setProfile(newProfile)
-        setOriginalProfile(newProfile)
+        setProfile(defaultProfile)
+        setOriginalProfile(defaultProfile)
       }
     } catch (error) {
       console.error('Error in createNewProfile:', error)

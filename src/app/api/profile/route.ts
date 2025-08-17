@@ -57,10 +57,7 @@ export async function GET(request: NextRequest) {
           return NextResponse.json({ error: 'Failed to create default profile' }, { status: 500 })
         }
 
-        // Check if account is soft deleted
-        if (newProfile.deleted_at) {
-          return NextResponse.json({ error: 'Account has been deleted' }, { status: 403 })
-        }
+        // Profile created successfully
 
         return NextResponse.json(newProfile)
       } else {
@@ -69,10 +66,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Check if account is soft deleted
-    if (profile.deleted_at) {
-      return NextResponse.json({ error: 'Account has been deleted' }, { status: 403 })
-    }
+    // Profile found successfully
 
     // Return the profile
     return NextResponse.json(profile)

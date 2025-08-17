@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS user_profiles (
     email_notifications BOOLEAN DEFAULT TRUE,
     admin_notifications BOOLEAN DEFAULT FALSE,
     meeting_notifications BOOLEAN DEFAULT FALSE,
+    deleted_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -81,10 +82,10 @@ ALTER TABLE opportunities ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for user_profiles
 CREATE POLICY "Users can view own profile" ON user_profiles
-    FOR SELECT USING (auth.uid() = user_id);
+    FOR SELECT USING (auth.uid() = user_id AND deleted_at IS NULL);
 
 CREATE POLICY "Users can update own profile" ON user_profiles
-    FOR UPDATE USING (auth.uid() = user_id);
+    FOR UPDATE USING (auth.uid() = user_id AND deleted_at IS NULL);
 
 CREATE POLICY "Users can create own profile" ON user_profiles
     FOR INSERT WITH CHECK (auth.uid() = user_id);
@@ -93,7 +94,7 @@ CREATE POLICY "Admins can view all profiles" ON user_profiles
     FOR SELECT USING (
         EXISTS (
             SELECT 1 FROM user_profiles 
-            WHERE user_id = auth.uid() AND is_admin = TRUE
+            WHERE user_id = auth.uid() AND is_admin = TRUE AND deleted_at IS NULL
         )
     );
 
@@ -101,7 +102,7 @@ CREATE POLICY "Admins can update all profiles" ON user_profiles
     FOR UPDATE USING (
         EXISTS (
             SELECT 1 FROM user_profiles 
-            WHERE user_id = auth.uid() AND is_admin = TRUE
+            WHERE user_id = auth.uid() AND is_admin = TRUE AND deleted_at IS NULL
         )
     );
 

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { cookies } from 'next/headers'
 
 export async function GET(request: NextRequest) {
   try {
@@ -34,7 +33,7 @@ export async function GET(request: NextRequest) {
 
     if (settingsError) {
       if (settingsError.code === 'PGRST116') {
-        // No settings found, create default settings
+        // No settings found, create default ones
         const { data: newSettings, error: createError } = await supabase
           .from('user_settings')
           .insert({
@@ -44,8 +43,7 @@ export async function GET(request: NextRequest) {
             marketing_emails: false,
             two_factor_auth: false,
             language: 'en',
-            timezone: 'UTC',
-            theme_preference: 'dark'
+            timezone: 'UTC'
           })
           .select()
           .single()
@@ -55,37 +53,15 @@ export async function GET(request: NextRequest) {
           return NextResponse.json({ error: 'Failed to create default settings' }, { status: 500 })
         }
 
-        // Return the newly created default settings
-        return NextResponse.json({
-          emailNotifications: newSettings.email_notifications,
-          pushNotifications: newSettings.push_notifications,
-          marketingEmails: newSettings.marketing_emails,
-          twoFactorAuth: newSettings.two_factor_auth,
-          language: newSettings.language,
-          timezone: newSettings.timezone,
-          themePreference: newSettings.theme_preference
-        })
+        return NextResponse.json(newSettings)
       } else {
         console.error('Error fetching settings:', settingsError)
         return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 })
       }
     }
 
-    // Check if account is soft deleted
-    if (settings.deleted_at) {
-      return NextResponse.json({ error: 'Account has been deleted' }, { status: 403 })
-    }
-
     // Return the settings
-    return NextResponse.json({
-      emailNotifications: settings.email_notifications,
-      pushNotifications: settings.push_notifications,
-      marketingEmails: settings.marketing_emails,
-      twoFactorAuth: settings.two_factor_auth,
-      language: settings.language,
-      timezone: settings.timezone,
-      themePreference: settings.theme_preference
-    })
+    return NextResponse.json(settings)
 
   } catch (error) {
     console.error('Error in GET /api/settings:', error)
@@ -116,32 +92,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Parse the request body
+    // Get the request body
     const body = await request.json()
     
-    // Validate the input
-    const {
-      emailNotifications,
-      pushNotifications,
-      marketingEmails,
-      twoFactorAuth,
-      language,
-      timezone,
-      themePreference
-    } = body
-
-    // Update user settings in the database
+    // Update user settings
     const { data: updatedSettings, error: updateError } = await supabase
       .from('user_settings')
       .upsert({
         user_id: user.id,
-        email_notifications: emailNotifications,
-        push_notifications: pushNotifications,
-        marketing_emails: marketingEmails,
-        two_factor_auth: twoFactorAuth,
-        language: language || 'en',
-        timezone: timezone || 'UTC',
-        theme_preference: themePreference || 'dark'
+        ...body
       }, {
         onConflict: 'user_id'
       })
@@ -153,19 +112,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 })
     }
 
-    // Return success response
-    return NextResponse.json({ 
-      message: 'Settings updated successfully',
-      settings: {
-        emailNotifications: updatedSettings.email_notifications,
-        pushNotifications: updatedSettings.push_notifications,
-        marketingEmails: updatedSettings.marketing_emails,
-        twoFactorAuth: updatedSettings.two_factor_auth,
-        language: updatedSettings.language,
-        timezone: updatedSettings.timezone,
-        themePreference: updatedSettings.theme_preference
-      }
-    })
+    return NextResponse.json(updatedSettings)
 
   } catch (error) {
     console.error('Error in POST /api/settings:', error)

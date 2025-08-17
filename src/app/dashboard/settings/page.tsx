@@ -31,6 +31,7 @@ export default function SettingsPage() {
   })
   const [isSaving, setIsSaving] = useState(false)
   const [saveMessage, setSaveMessage] = useState('')
+  const [saveMessageType, setSaveMessageType] = useState<'success' | 'error'>('success')
   const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'preferences' | 'security'>('profile')
 
   useEffect(() => {
@@ -119,12 +120,15 @@ export default function SettingsPage() {
       })
 
       if (response.ok) {
+        setSaveMessageType('success')
         setSaveMessage('Profile updated successfully!')
         setTimeout(() => setSaveMessage(''), 3000)
       } else {
+        setSaveMessageType('error')
         setSaveMessage('Error updating profile')
       }
     } catch (error) {
+      setSaveMessageType('error')
       setSaveMessage('Error updating profile')
     } finally {
       setIsSaving(false)
@@ -152,12 +156,15 @@ export default function SettingsPage() {
       })
 
       if (response.ok) {
+        setSaveMessageType('success')
         setSaveMessage('Settings saved successfully!')
         setTimeout(() => setSaveMessage(''), 3000)
       } else {
+        setSaveMessageType('error')
         setSaveMessage('Error saving settings')
       }
     } catch (error) {
+      setSaveMessageType('error')
       setSaveMessage('Error saving settings')
     } finally {
       setIsSaving(false)
@@ -279,11 +286,19 @@ export default function SettingsPage() {
           <div style={{
             padding: '1rem',
             marginBottom: '2rem',
-            background: saveMessage.includes('success') ? 'rgba(154, 242, 58, 0.1)' : 'rgba(255, 122, 41, 0.1)',
-            border: `1px solid ${saveMessage.includes('success') ? 'rgba(154, 242, 58, 0.3)' : 'rgba(255, 122, 41, 0.3)'}`,
+            background: saveMessageType === 'success' ? 'rgba(154, 242, 58, 0.1)' : 'rgba(255, 122, 41, 0.1)',
+            border: `1px solid ${saveMessageType === 'success' ? 'rgba(154, 242, 58, 0.3)' : 'rgba(255, 122, 41, 0.3)'}`,
             borderRadius: '0.5rem',
-            color: saveMessage.includes('success') ? '#9AF23A' : '#FF7A29'
+            color: saveMessageType === 'success' ? '#9AF23A' : '#FF7A29',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
           }}>
+            {saveMessageType === 'success' ? (
+              <span style={{ fontSize: '1.25rem' }}>✅</span>
+            ) : (
+              <span style={{ fontSize: '1.25rem' }}>⚠️</span>
+            )}
             {saveMessage}
           </div>
         )}
@@ -805,6 +820,38 @@ export default function SettingsPage() {
               </div>
 
               <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '1rem',
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '0.5rem'
+              }}>
+                <div>
+                  <h3 style={{ color: 'white', marginBottom: '0.25rem' }}>Session Management</h3>
+                  <p style={{ color: '#9CA3AF', fontSize: '0.875rem' }}>Manage active sessions and device access</p>
+                </div>
+                <button
+                  onClick={() => {
+                    // This would typically open a modal or navigate to session management
+                    alert('Session management feature coming soon!')
+                  }}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    background: 'rgba(45, 91, 255, 0.2)',
+                    border: '1px solid rgba(45, 91, 255, 0.4)',
+                    borderRadius: '0.25rem',
+                    color: '#2D5BFF',
+                    cursor: 'pointer',
+                    fontSize: '0.75rem',
+                    fontWeight: 500
+                  }}
+                >
+                  Manage Sessions
+                </button>
+              </div>
+
+              <div style={{
                 padding: '1rem',
                 background: 'rgba(255, 122, 41, 0.1)',
                 border: '1px solid rgba(255, 122, 41, 0.3)',
@@ -815,6 +862,31 @@ export default function SettingsPage() {
                 <p style={{ fontSize: '0.875rem', margin: 0 }}>
                   To change your password, please use the &quot;Forgot Password&quot; option on the sign-in page.
                 </p>
+              </div>
+
+              <div style={{
+                padding: '1rem',
+                background: 'rgba(45, 91, 255, 0.1)',
+                border: '1px solid rgba(45, 91, 255, 0.3)',
+                borderRadius: '0.5rem',
+                color: '#2D5BFF'
+              }}>
+                <h4 style={{ marginBottom: '0.5rem' }}>Account Activity</h4>
+                <p style={{ fontSize: '0.875rem', margin: 0 }}>
+                  Monitor your account for any suspicious activity. All login attempts are logged and monitored.
+                </p>
+              </div>
+
+              <div style={{
+                padding: '1rem',
+                background: 'rgba(154, 242, 58, 0.1)',
+                border: '1px solid rgba(154, 242, 58, 0.3)',
+                borderRadius: '0.5rem',
+                color: '#9AF23A'
+              }}>
+                <h4 style={{ fontSize: '0.875rem', margin: 0 }}>
+                  🔒 Your account is protected with industry-standard security measures
+                </h4>
               </div>
             </div>
 

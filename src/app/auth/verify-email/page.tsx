@@ -57,17 +57,28 @@ function VerifyEmailContent() {
 
   const resendVerification = async () => {
     try {
+      // Get email from URL params or prompt user
+      let email = searchParams.get('email')
+      
+      if (!email) {
+        // If no email in URL, prompt user to enter it
+        email = prompt('Please enter your email address to resend verification:')
+        if (!email) return
+      }
+
       const { error } = await supabase.auth.resend({
         type: 'signup',
-        email: searchParams.get('email') || ''
+        email: email
       })
 
       if (error) {
-        setErrorMessage('Failed to resend verification email. Please try again.')
+        console.error('Resend error:', error)
+        setErrorMessage(`Failed to resend verification email: ${error.message}`)
       } else {
         setErrorMessage('Verification email sent! Please check your inbox.')
       }
     } catch (error) {
+      console.error('Resend error:', error)
       setErrorMessage('Failed to resend verification email. Please try again.')
     }
   }

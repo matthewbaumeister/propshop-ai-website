@@ -21,7 +21,16 @@ interface ProfileData {
 export default function SettingsPage() {
   const { user } = useAuth()
   const [profile, setProfile] = useState<ProfileData>({})
+  const [originalProfile, setOriginalProfile] = useState<ProfileData>({})
   const [settings, setSettings] = useState({
+    emailNotifications: true,
+    pushNotifications: false,
+    marketingEmails: false,
+    twoFactorAuth: false,
+    language: 'en',
+    timezone: 'UTC'
+  })
+  const [originalSettings, setOriginalSettings] = useState({
     emailNotifications: true,
     pushNotifications: false,
     marketingEmails: false,
@@ -54,6 +63,7 @@ export default function SettingsPage() {
       if (response.ok) {
         const data = await response.json()
         setProfile(data)
+        setOriginalProfile(data) // Store original values for change detection
       }
     } catch (error) {
       console.error('Error loading profile:', error)
@@ -73,29 +83,34 @@ export default function SettingsPage() {
       if (response.ok) {
         const data = await response.json()
         setSettings(data)
+        setOriginalSettings(data) // Store original values for change detection
       } else {
         console.error('Failed to load settings:', response.status)
         // Set default settings if none exist
-        setSettings({
+        const defaultSettings = {
           emailNotifications: true,
           pushNotifications: false,
           marketingEmails: false,
           twoFactorAuth: false,
           language: 'en',
           timezone: 'UTC'
-        })
+        }
+        setSettings(defaultSettings)
+        setOriginalSettings(defaultSettings)
       }
     } catch (error) {
       console.error('Error loading settings:', error)
       // Set default settings on error
-      setSettings({
+      const defaultSettings = {
         emailNotifications: true,
         pushNotifications: false,
         marketingEmails: false,
         twoFactorAuth: false,
         language: 'en',
         timezone: 'UTC'
-      })
+      }
+      setSettings(defaultSettings)
+      setOriginalSettings(defaultSettings)
     }
   }
 
@@ -122,6 +137,7 @@ export default function SettingsPage() {
       if (response.ok) {
         setSaveMessageType('success')
         setSaveMessage('Profile updated successfully!')
+        setOriginalProfile(profile) // Reset original values after successful save
         setTimeout(() => setSaveMessage(''), 3000)
       } else {
         setSaveMessageType('error')
@@ -158,6 +174,7 @@ export default function SettingsPage() {
       if (response.ok) {
         setSaveMessageType('success')
         setSaveMessage('Settings saved successfully!')
+        setOriginalSettings(settings) // Reset original values after successful save
         setTimeout(() => setSaveMessage(''), 3000)
       } else {
         setSaveMessageType('error')
@@ -183,6 +200,36 @@ export default function SettingsPage() {
       ...prev,
       [setting]: value
     }))
+  }
+
+  // Check if profile has changes
+  const hasProfileChanges = () => {
+    return Object.keys(profile).some(key => {
+      const field = key as keyof ProfileData
+      return profile[field] !== originalProfile[field]
+    })
+  }
+
+  // Check if settings have changes
+  const hasSettingsChanges = () => {
+    return Object.keys(settings).some(key => {
+      const field = key as keyof typeof settings
+      return settings[field] !== originalSettings[field]
+    })
+  }
+
+  // Check if current tab has changes
+  const hasCurrentTabChanges = () => {
+    switch (activeTab) {
+      case 'profile':
+        return hasProfileChanges()
+      case 'notifications':
+      case 'preferences':
+      case 'security':
+        return hasSettingsChanges()
+      default:
+        return false
+    }
   }
 
   if (!user) {
@@ -527,17 +574,17 @@ export default function SettingsPage() {
 
             <button
               onClick={handleProfileSave}
-              disabled={isSaving}
+              disabled={isSaving || !hasProfileChanges()}
               style={{
                 padding: '0.75rem 2rem',
-                background: 'linear-gradient(135deg, #2D5BFF, #9AF23A)',
+                background: hasProfileChanges() ? 'linear-gradient(135deg, #2D5BFF, #9AF23A)' : 'rgba(128, 128, 128, 0.3)',
                 border: 'none',
                 borderRadius: '0.5rem',
                 color: 'white',
                 fontSize: '0.875rem',
                 fontWeight: 600,
-                cursor: isSaving ? 'not-allowed' : 'pointer',
-                opacity: isSaving ? 0.6 : 1,
+                cursor: (isSaving || !hasProfileChanges()) ? 'not-allowed' : 'pointer',
+                opacity: (isSaving || !hasProfileChanges()) ? 0.6 : 1,
                 transition: 'all 0.2s ease'
               }}
             >
@@ -645,17 +692,17 @@ export default function SettingsPage() {
 
             <button
               onClick={handleSettingsSave}
-              disabled={isSaving}
+              disabled={isSaving || !hasSettingsChanges()}
               style={{
                 padding: '0.75rem 2rem',
-                background: 'linear-gradient(135deg, #2D5BFF, #9AF23A)',
+                background: hasSettingsChanges() ? 'linear-gradient(135deg, #2D5BFF, #9AF23A)' : 'rgba(128, 128, 128, 0.3)',
                 border: 'none',
                 borderRadius: '0.5rem',
                 color: 'white',
                 fontSize: '0.875rem',
                 fontWeight: 600,
-                cursor: isSaving ? 'not-allowed' : 'pointer',
-                opacity: isSaving ? 0.6 : 1,
+                cursor: (isSaving || !hasSettingsChanges()) ? 'not-allowed' : 'pointer',
+                opacity: (isSaving || !hasSettingsChanges()) ? 0.6 : 1,
                 transition: 'all 0.2s ease'
               }}
             >
@@ -752,17 +799,17 @@ export default function SettingsPage() {
 
             <button
               onClick={handleSettingsSave}
-              disabled={isSaving}
+              disabled={isSaving || !hasSettingsChanges()}
               style={{
                 padding: '0.75rem 2rem',
-                background: 'linear-gradient(135deg, #2D5BFF, #9AF23A)',
+                background: hasSettingsChanges() ? 'linear-gradient(135deg, #2D5BFF, #9AF23A)' : 'rgba(128, 128, 128, 0.3)',
                 border: 'none',
                 borderRadius: '0.5rem',
                 color: 'white',
                 fontSize: '0.875rem',
                 fontWeight: 600,
-                cursor: isSaving ? 'not-allowed' : 'pointer',
-                opacity: isSaving ? 0.6 : 1,
+                cursor: (isSaving || !hasSettingsChanges()) ? 'not-allowed' : 'pointer',
+                opacity: (isSaving || !hasSettingsChanges()) ? 0.6 : 1,
                 transition: 'all 0.2s ease'
               }}
             >
@@ -892,17 +939,17 @@ export default function SettingsPage() {
 
             <button
               onClick={handleSettingsSave}
-              disabled={isSaving}
+              disabled={isSaving || !hasSettingsChanges()}
               style={{
                 padding: '0.75rem 2rem',
-                background: 'linear-gradient(135deg, #2D5BFF, #9AF23A)',
+                background: hasSettingsChanges() ? 'linear-gradient(135deg, #2D5BFF, #9AF23A)' : 'rgba(128, 128, 128, 0.3)',
                 border: 'none',
                 borderRadius: '0.5rem',
                 color: 'white',
                 fontSize: '0.875rem',
                 fontWeight: 600,
-                cursor: isSaving ? 'not-allowed' : 'pointer',
-                opacity: isSaving ? 0.6 : 1,
+                cursor: (isSaving || !hasSettingsChanges()) ? 'not-allowed' : 'pointer',
+                opacity: (isSaving || !hasSettingsChanges()) ? 0.6 : 1,
                 transition: 'all 0.2s ease'
               }}
             >

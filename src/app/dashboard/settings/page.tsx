@@ -962,16 +962,22 @@ export default function SettingsPage() {
                   <h3 style={{ color: 'white', marginBottom: '0.5rem', fontSize: '1rem', fontWeight: 600 }}>Two-Factor Authentication</h3>
                   <p style={{ color: '#9CA3AF', fontSize: '0.875rem', margin: 0 }}>Add an extra layer of security to your account</p>
                 </div>
-                <input
-                  type="checkbox"
-                  checked={settings.twoFactorAuth}
-                  onChange={(e) => handle2FAToggle(e.target.checked)}
+                <button
+                  onClick={() => handle2FAToggle(!settings.twoFactorAuth)}
                   style={{
-                    width: '1.25rem',
-                    height: '1.25rem',
-                    accentColor: '#9AF23A'
+                    padding: '0.5rem 1rem',
+                    background: settings.twoFactorAuth ? 'rgba(154, 242, 58, 0.2)' : 'rgba(45, 91, 255, 0.2)',
+                    border: `1px solid ${settings.twoFactorAuth ? 'rgba(154, 242, 58, 0.4)' : 'rgba(45, 91, 255, 0.4)'}`,
+                    borderRadius: '0.25rem',
+                    color: settings.twoFactorAuth ? '#9AF23A' : '#2D5BFF',
+                    cursor: 'pointer',
+                    fontSize: '0.75rem',
+                    fontWeight: 500,
+                    transition: 'all 0.2s ease'
                   }}
-                />
+                >
+                  {settings.twoFactorAuth ? 'Turn Off' : 'Turn On'}
+                </button>
               </div>
 
               <div style={{

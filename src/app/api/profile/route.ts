@@ -33,6 +33,36 @@ export async function GET(request: NextRequest) {
 
     if (profileError) {
       console.error('Error fetching profile:', profileError)
+      
+      // If profile doesn't exist, create a default one
+      if (profileError.code === 'PGRST116') {
+        const { data: newProfile, error: createError } = await supabase
+          .from('user_profiles')
+          .insert({
+            user_id: user.id,
+            first_name: user.user_metadata?.name || user.email?.split('@')[0] || '',
+            last_name: '',
+            company: '',
+            role: 'user',
+            phone: '',
+            bio: '',
+            is_admin: false,
+            theme_preference: 'dark',
+            email_notifications: true,
+            admin_notifications: false,
+            meeting_notifications: false
+          })
+          .select()
+          .single()
+
+        if (createError) {
+          console.error('Error creating profile:', createError)
+          return NextResponse.json({ error: 'Failed to create profile' }, { status: 500 })
+        }
+
+        return NextResponse.json(newProfile)
+      }
+      
       return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 })
     }
 

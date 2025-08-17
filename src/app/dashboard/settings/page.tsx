@@ -53,6 +53,29 @@ export default function SettingsPage() {
   const [isDeletingAccount, setIsDeletingAccount] = useState(false)
   const [emailVerified, setEmailVerified] = useState(false)
 
+  // Phone number formatting functions
+  const formatPhoneNumber = (value: string) => {
+    // Remove all non-digits
+    const phoneNumber = value.replace(/\D/g, '')
+    
+    // Format based on length
+    if (phoneNumber.length === 0) return ''
+    if (phoneNumber.length <= 3) return `(${phoneNumber}`
+    if (phoneNumber.length <= 6) return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`
+    if (phoneNumber.length <= 10) return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6)}`
+    return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`
+  }
+
+  const unformatPhoneNumber = (value: string) => {
+    // Remove all non-digits for storage
+    return value.replace(/\D/g, '')
+  }
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value)
+    setProfile(prev => ({ ...prev, phone: formatted }))
+  }
+
   useEffect(() => {
     if (user) {
       // Clear any old deleted records first
@@ -114,8 +137,13 @@ export default function SettingsPage() {
         await createNewProfile()
       } else {
         console.log('Profile loaded successfully:', profile)
-        setProfile(profile)
-        setOriginalProfile(profile) // Store original values for change detection
+        // Format the phone number for display
+        const formattedProfile = {
+          ...profile,
+          phone: profile.phone ? formatPhoneNumber(profile.phone) : ''
+        }
+        setProfile(formattedProfile)
+        setOriginalProfile(formattedProfile) // Store original values for change detection
       }
     } catch (error) {
       console.error('Error loading profile:', error)
@@ -362,13 +390,19 @@ export default function SettingsPage() {
         return
       }
 
+      // Unformat the phone number before saving
+      const profileToSave = {
+        ...profile,
+        phone: profile.phone ? unformatPhoneNumber(profile.phone) : ''
+      }
+
       const response = await fetch('/api/profile', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`
         },
-        body: JSON.stringify(profile),
+        body: JSON.stringify(profileToSave),
       })
 
       if (response.ok) {
@@ -928,7 +962,7 @@ export default function SettingsPage() {
                 <input
                   type="tel"
                   value={profile.phone || ''}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  onChange={handlePhoneChange}
                   style={{
                     width: '100%',
                     padding: '0.75rem',

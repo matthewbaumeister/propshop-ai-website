@@ -88,19 +88,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (data.user) {
-        // Check if the account has been soft deleted
+        // Check if the account has been marked as deleted
         try {
-          const response = await fetch('/api/auth/check-deleted', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email })
-          })
-
-          const checkResult = await response.json()
+          const { data: deletionCheck, error: checkError } = await supabase
+            .rpc('check_user_deletion_status', { user_uuid: data.user.id })
           
-          if (checkResult.deleted) {
+          if (checkError) {
+            console.error('Error checking deletion status:', checkError)
+          } else if (deletionCheck) {
             // Sign out the user immediately if account is deleted
             await supabase.auth.signOut()
             return { 
@@ -144,6 +139,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, firstName: string, profileData?: ProfileData) => {
     try {
+      // First, clean up any deleted user data for this email
+      // This ensures new signups work even if there was a previous deleted account
+      try {
+        const { data: cleanupResult, error: cleanupError } = await supabase
+          .rpc('cleanup_deleted_user_data', { user_email: email })
+        
+        if (cleanupError) {
+          console.error('Error cleaning up deleted user data:', cleanupError)
+        } else if (cleanupResult) {
+          console.log('Cleaned up deleted user data for email:', email)
+        }
+      } catch (cleanupError) {
+        console.error('Error during cleanup:', cleanupError)
+        // Continue with signup even if cleanup fails
+      }
+
       // Debug: Log what we're sending
       const userData = {
         name: firstName,

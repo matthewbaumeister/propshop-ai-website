@@ -161,17 +161,17 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Completely delete user account using the admin function
-    // This will prevent them from signing back in
+    // Mark user as deleted instead of completely removing them
+    // This prevents signin while allowing new signups with same email
     const { data: deleteResult, error: deleteError } = await supabase
-      .rpc('admin_delete_user_completely', { user_uuid: user.id })
+      .rpc('mark_user_as_deleted', { user_uuid: user.id })
 
     if (deleteError) {
-      console.error('Error completely deleting user account:', deleteError)
+      console.error('Error marking user as deleted:', deleteError)
       return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 })
     }
 
-    // Sign out the user from Supabase Auth (this will happen automatically anyway)
+    // Sign out the user from Supabase Auth
     const { error: signOutError } = await supabase.auth.signOut()
     if (signOutError) {
       console.error('Error signing out user:', signOutError)
@@ -180,7 +180,7 @@ export async function DELETE(request: NextRequest) {
 
     // Return success response
     return NextResponse.json({ 
-      message: 'Account completely deleted successfully. You will need to sign up again if you want to rejoin.'
+      message: 'Account deleted successfully. You will need to sign up again if you want to rejoin.'
     })
 
   } catch (error) {

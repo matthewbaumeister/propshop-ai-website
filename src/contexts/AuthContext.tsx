@@ -186,6 +186,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log('SignUp - Supabase response:', data);
       if (data.user) {
         console.log('SignUp - User metadata:', data.user.user_metadata);
+        
+        // Now create the user profile and settings using our RPC function
+        try {
+          const { data: profileResult, error: profileError } = await supabase
+            .rpc('create_user_profile_after_signup', {
+              user_email: email,
+              first_name: profileData?.first_name || firstName,
+              last_name: profileData?.last_name || '',
+              company: profileData?.company || ''
+            });
+          
+          if (profileError) {
+            console.error('Profile creation error:', profileError);
+            // Don't fail the signup, but log the error
+          } else if (profileResult) {
+            console.log('Profile creation result:', profileResult);
+          }
+        } catch (profileError) {
+          console.error('Profile creation exception:', profileError);
+          // Don't fail the signup, but log the error
+        }
       }
 
       // Don't set user immediately - they need to verify email first

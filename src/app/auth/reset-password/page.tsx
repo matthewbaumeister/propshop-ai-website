@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabaseClient'
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [password, setPassword] = useState('')
@@ -359,5 +359,56 @@ export default function ResetPasswordPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="page-content" style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #0B1220 0%, #1E293B 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '2rem 1rem'
+      }}>
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.02)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '1rem',
+          padding: '2rem',
+          maxWidth: '500px',
+          width: '100%',
+          textAlign: 'center'
+        }}>
+          <div style={{
+            width: '60px',
+            height: '60px',
+            border: '3px solid rgba(154, 242, 58, 0.3)',
+            borderTop: '3px solid #9AF23A',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 1rem'
+          }}></div>
+          <h1 style={{
+            color: 'white',
+            fontSize: '1.5rem',
+            fontWeight: 700,
+            marginBottom: '0.5rem'
+          }}>
+            Loading...
+          </h1>
+          <p style={{
+            color: '#9CA3AF',
+            fontSize: '0.875rem'
+          }}>
+            Preparing password reset page...
+          </p>
+        </div>
+      </div>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
   )
 }

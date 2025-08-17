@@ -1,21 +1,40 @@
--- Ultra simple diagnostic script
+-- Ultra Simple Diagnostic - This will definitely show results
 -- Run this in your Supabase SQL Editor
 
--- Test 1: Basic table access
-SELECT 'Test 1: Can we access tables?' as test_name;
-SELECT COUNT(*) as user_profiles_count FROM user_profiles;
-SELECT COUNT(*) as user_settings_count FROM user_settings;
+-- 1. Check if user exists in auth.users
+SELECT 'CHECKING USER IN AUTH.USERS:' as step;
+SELECT 
+    id::text as user_id,
+    email,
+    created_at::text as created,
+    email_confirmed_at::text as email_confirmed
+FROM auth.users 
+WHERE email = 'matt@make-ready-consulting.com';
 
--- Test 2: Check for triggers
-SELECT 'Test 2: What triggers exist?' as test_name;
-SELECT trigger_name FROM information_schema.triggers WHERE event_object_table = 'auth.users';
+-- 2. Check if there are any triggers on auth.users
+SELECT 'CHECKING TRIGGERS ON AUTH.USERS:' as step;
+SELECT 
+    trigger_name,
+    event_manipulation,
+    action_statement
+FROM information_schema.triggers
+WHERE event_object_table = 'auth.users';
 
--- Test 3: Check for functions
-SELECT 'Test 3: What functions exist?' as test_name;
-SELECT routine_name FROM information_schema.routines WHERE routine_name LIKE '%user%';
+-- 3. Check if there are any existing profiles
+SELECT 'CHECKING EXISTING PROFILES:' as step;
+SELECT 
+    up.id::text as profile_id,
+    up.user_id::text as user_id,
+    up.first_name,
+    up.last_name,
+    up.company,
+    up.deleted_at::text as deleted
+FROM user_profiles up
+JOIN auth.users au ON up.user_id = au.id
+WHERE au.email = 'matt@make-ready-consulting.com';
 
--- Test 4: Try to create a profile manually
-SELECT 'Test 4: Manual profile creation test' as test_name;
+-- 4. Try a simple insert to see what happens
+SELECT 'ATTEMPTING SIMPLE INSERT:' as step;
 INSERT INTO user_profiles (
     user_id,
     first_name,
@@ -29,11 +48,12 @@ INSERT INTO user_profiles (
     email_notifications,
     admin_notifications,
     meeting_notifications
-) VALUES (
-    gen_random_uuid(),
-    'Test',
-    'User',
-    'Test Company',
+) 
+SELECT 
+    au.id,
+    'Matt',
+    'Baumeister',
+    'Make Ready Consulting',
     'user',
     '',
     '',
@@ -42,9 +62,11 @@ INSERT INTO user_profiles (
     TRUE,
     FALSE,
     FALSE
-) RETURNING id, first_name;
-
--- Test 5: Clean up test data
-SELECT 'Test 5: Cleanup test' as test_name;
-DELETE FROM user_profiles WHERE first_name = 'Test' AND company = 'Test Company';
-SELECT 'Cleanup completed' as status;
+FROM auth.users au
+WHERE au.email = 'matt@make-ready-consulting.com'
+RETURNING 
+    id::text as profile_id,
+    user_id::text as user_id,
+    first_name,
+    last_name,
+    company;

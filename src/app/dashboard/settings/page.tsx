@@ -1400,6 +1400,22 @@ export default function SettingsPage() {
                   <li>Account access and authentication</li>
                   <li>Any saved data or configurations</li>
                 </ul>
+                <div style={{
+                  marginTop: '1rem',
+                  padding: '0.75rem',
+                  background: 'rgba(154, 242, 58, 0.1)',
+                  border: '1px solid rgba(154, 242, 58, 0.3)',
+                  borderRadius: '0.5rem'
+                }}>
+                  <p style={{
+                    color: '#9AF23A',
+                    fontSize: '0.875rem',
+                    margin: 0,
+                    fontWeight: 500
+                  }}>
+                    💡 <strong>Note:</strong> You can always create a new account with the same email address after deletion.
+                  </p>
+                </div>
               </div>
 
               <div style={{

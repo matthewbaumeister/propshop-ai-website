@@ -145,6 +145,24 @@ export default function SignInPage() {
               fontSize: '0.875rem'
             }}>
               {error}
+              {error.includes('deleted') && (
+                <div style={{
+                  marginTop: '0.75rem',
+                  paddingTop: '0.75rem',
+                  borderTop: '1px solid rgba(239, 68, 68, 0.2)'
+                }}>
+                  <p style={{ marginBottom: '0.5rem' }}>
+                    Need a new account?{' '}
+                    <Link href="/auth/signup" style={{
+                      color: '#9AF23A',
+                      textDecoration: 'none',
+                      fontWeight: 600
+                    }}>
+                      Click here to Sign Up
+                    </Link>
+                  </p>
+                </div>
+              )}
             </div>
           )}
 

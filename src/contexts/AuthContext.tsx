@@ -92,7 +92,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (checkResult.deleted) {
             // Sign out the user immediately if account is deleted
             await supabase.auth.signOut()
-            return { error: { message: 'This account has been deleted and cannot be accessed.' } }
+            return { 
+              error: { 
+                message: 'This account has been deleted and cannot be accessed. To create a new account, please use the Sign Up option below.',
+                requiresSignUp: true
+              } 
+            }
           }
         } catch (checkError) {
           console.error('Error checking account status:', checkError)

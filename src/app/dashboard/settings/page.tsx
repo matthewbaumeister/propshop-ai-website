@@ -899,41 +899,39 @@ export default function SettingsPage() {
               </div>
 
               <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
                 padding: '1rem',
                 background: 'rgba(255, 122, 41, 0.1)',
                 border: '1px solid rgba(255, 122, 41, 0.3)',
                 borderRadius: '0.5rem',
                 color: '#FF7A29'
               }}>
-                <h4 style={{ marginBottom: '0.5rem' }}>Password Change</h4>
-                <p style={{ fontSize: '0.875rem', margin: 0 }}>
-                  To change your password, please use the &quot;Forgot Password&quot; option on the sign-in page.
-                </p>
-              </div>
-
-              <div style={{
-                padding: '1rem',
-                background: 'rgba(45, 91, 255, 0.1)',
-                border: '1px solid rgba(45, 91, 255, 0.3)',
-                borderRadius: '0.5rem',
-                color: '#2D5BFF'
-              }}>
-                <h4 style={{ marginBottom: '0.5rem' }}>Account Activity</h4>
-                <p style={{ fontSize: '0.875rem', margin: 0 }}>
-                  Monitor your account for any suspicious activity. All login attempts are logged and monitored.
-                </p>
-              </div>
-
-              <div style={{
-                padding: '1rem',
-                background: 'rgba(154, 242, 58, 0.1)',
-                border: '1px solid rgba(154, 242, 58, 0.3)',
-                borderRadius: '0.5rem',
-                color: '#9AF23A'
-              }}>
-                <h4 style={{ fontSize: '0.875rem', margin: 0 }}>
-                  🔒 Your account is protected with industry-standard security measures
-                </h4>
+                <div>
+                  <h4 style={{ marginBottom: '0.5rem' }}>Password Change</h4>
+                  <p style={{ fontSize: '0.875rem', margin: 0 }}>
+                    Update your account password for enhanced security
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    // This would typically open a password change modal or navigate to password change page
+                    alert('Password change feature coming soon!')
+                  }}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    background: 'rgba(255, 122, 41, 0.2)',
+                    border: '1px solid rgba(255, 122, 41, 0.4)',
+                    borderRadius: '0.25rem',
+                    color: '#FF7A29',
+                    cursor: 'pointer',
+                    fontSize: '0.75rem',
+                    fontWeight: 500
+                  }}
+                >
+                  Change Password
+                </button>
               </div>
             </div>
 

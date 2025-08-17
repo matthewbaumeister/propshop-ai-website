@@ -1140,7 +1140,7 @@ export default function SettingsPage() {
                       opacity: is2FASetupLoading ? 0.6 : 1
                     }}
                   >
-                    I've Scanned the QR Code
+                    I&apos;ve Scanned the QR Code
                   </button>
                 </div>
               )}

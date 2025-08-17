@@ -29,6 +29,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ deleted: false, exists: false })
     }
 
+    // Debug: Log user object to see available fields
+    console.log('User object from auth.admin.listUsers:', {
+      id: user.id,
+      email: user.email,
+      deleted_at: user.deleted_at,
+      confirmed_at: user.confirmed_at,
+      email_confirmed_at: user.email_confirmed_at
+    })
+
     // Check if user profile is soft deleted
     const { data: profile, error: profileError } = await supabase
       .from('user_profiles')
@@ -41,7 +50,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to check user status' }, { status: 500 })
     }
 
-    const isDeleted = profile?.deleted_at ? true : false
+    // Check if user is deleted in auth.users or if profile is soft deleted
+    // Note: Supabase might use different field names for deletion status
+    const isDeleted = user.deleted_at || profile?.deleted_at ? true : false
 
     return NextResponse.json({ 
       deleted: isDeleted, 

@@ -161,12 +161,12 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Soft delete user account using the database function
-    const { data: softDeleteResult, error: softDeleteError } = await supabase
-      .rpc('soft_delete_user', { user_uuid: user.id })
+    // Remove email verification and soft delete user account using the database function
+    const { data: deleteResult, error: deleteError } = await supabase
+      .rpc('remove_email_verification_and_delete_user', { user_uuid: user.id })
 
-    if (softDeleteError) {
-      console.error('Error soft deleting user:', softDeleteError)
+    if (deleteError) {
+      console.error('Error deleting user and removing email verification:', deleteError)
       return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 })
     }
 

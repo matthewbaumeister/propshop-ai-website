@@ -561,9 +561,9 @@ export default function SettingsPage() {
   }
 
   const handleDeleteAccount = async () => {
-    if (!confirm('Are you absolutely sure you want to delete your account? This action cannot be undone. If you rejoin with the same email, you will need to verify your email address again.')) {
-      return
-    }
+            if (!confirm('Are you absolutely sure you want to delete your account? This action cannot be undone. Your account will be completely removed and you will need to sign up again if you want to rejoin.')) {
+          return
+        }
     
     setIsDeletingAccount(true)
     
@@ -1511,8 +1511,7 @@ export default function SettingsPage() {
                 lineHeight: '1.5'
               }}>
                 This action cannot be undone. This will permanently delete your account, 
-                profile, and all associated data. If you rejoin with the same email, 
-                you will need to verify your email address again. Please be certain.
+                profile, and all associated data. You will need to sign up again if you want to rejoin. Please be certain.
               </p>
               <button
                 onClick={() => setShowDeleteModal(true)}
@@ -1851,7 +1850,7 @@ export default function SettingsPage() {
                     margin: 0,
                     fontWeight: 500
                   }}>
-                    💡 <strong>Note:</strong> You can always create a new account with the same email address after deletion, but you will need to verify your email again.
+                    💡 <strong>Note:</strong> You can always create a new account with the same email address after deletion, but you will need to sign up again as a completely new user.
                   </p>
                 </div>
               </div>

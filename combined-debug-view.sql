@@ -52,7 +52,6 @@ SELECT 'EXISTING FUNCTIONS' as section,
        NULL as detail_4
 FROM information_schema.routines 
 WHERE routine_name LIKE '%profile%' OR routine_name LIKE '%user%'
-ORDER BY routine_name
 
 UNION ALL
 
@@ -62,7 +61,6 @@ SELECT 'EXISTING TRIGGERS' as section,
        event_manipulation as detail_3,
        NULL as detail_4
 FROM information_schema.triggers
-ORDER BY event_object_table, trigger_name
 
 UNION ALL
 
@@ -72,4 +70,5 @@ SELECT 'EXISTING RLS POLICIES' as section,
        cmd as detail_3,
        NULL as detail_4
 FROM pg_policies
-ORDER BY schemaname, tablename, policyname;
+
+ORDER BY section;

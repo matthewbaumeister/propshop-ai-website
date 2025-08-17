@@ -1430,8 +1430,16 @@ export default function SettingsPage() {
                     opacity: isDeletingAccount ? 0.6 : 1,
                     transition: 'background-color 0.2s ease'
                   }}
-                  onMouseEnter={(e) => !isDeletingAccount && (e.target as HTMLButtonElement).style.backgroundColor = '#b91c1c'}
-                  onMouseLeave={(e) => !isDeletingAccount && (e.target as HTMLButtonElement).style.backgroundColor = '#dc2626'}
+                  onMouseEnter={(e) => {
+                    if (!isDeletingAccount) {
+                      (e.target as HTMLButtonElement).style.backgroundColor = '#b91c1c'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isDeletingAccount) {
+                      (e.target as HTMLButtonElement).style.backgroundColor = '#dc2626'
+                    }
+                  }}
                 >
                   {isDeletingAccount ? 'Deleting...' : 'Yes, Delete My Account'}
                 </button>

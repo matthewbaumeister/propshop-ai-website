@@ -136,7 +136,7 @@ END $$;
 SELECT 'Step 8: Database activity check:' as info;
 SELECT 
     'Active connections' as info,
-    COUNT(*) as count
+    COUNT(*)::text as count
 FROM pg_stat_activity
 WHERE state = 'active'
 UNION ALL

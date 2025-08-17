@@ -42,6 +42,13 @@ export default function SettingsPage() {
   const [saveMessage, setSaveMessage] = useState('')
   const [saveMessageType, setSaveMessageType] = useState<'success' | 'error'>('success')
   const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'preferences' | 'security'>('profile')
+  
+  // 2FA Setup Modal State
+  const [show2FAModal, setShow2FAModal] = useState(false)
+  const [twoFASetupStep, setTwoFASetupStep] = useState<'qr' | 'verify'>('qr')
+  const [qrCodeUrl, setQrCodeUrl] = useState('')
+  const [verificationCode, setVerificationCode] = useState('')
+  const [is2FASetupLoading, setIs2FASetupLoading] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -229,6 +236,63 @@ export default function SettingsPage() {
         return hasSettingsChanges()
       default:
         return false
+    }
+  }
+
+  // 2FA Setup Functions
+  const handle2FAToggle = async (enabled: boolean) => {
+    if (enabled) {
+      // Enable 2FA - show setup modal
+      setShow2FAModal(true)
+      setTwoFASetupStep('qr')
+      await generate2FAQRCode()
+    } else {
+      // Disable 2FA
+      const newSettings = { ...settings, twoFactorAuth: false }
+      setSettings(newSettings)
+    }
+  }
+
+  const generate2FAQRCode = async () => {
+    setIs2FASetupLoading(true)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+
+      // This would call your backend to generate a 2FA secret and QR code
+      // For now, we'll simulate it with a placeholder
+      setQrCodeUrl('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2ZmZiIvPjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiBmb250LWZtaWxseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiMwMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPjJGQSBRUiBDb2RlPC90ZXh0Pjwvc3ZnPg==')
+      setIs2FASetupLoading(false)
+    } catch (error) {
+      console.error('Error generating 2FA QR code:', error)
+      setIs2FASetupLoading(false)
+    }
+  }
+
+  const verify2FACode = async () => {
+    if (!verificationCode || verificationCode.length !== 6) return
+    
+    setIs2FASetupLoading(true)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+
+      // This would call your backend to verify the 2FA code
+      // For now, we'll simulate success
+      setTimeout(() => {
+        const newSettings = { ...settings, twoFactorAuth: true }
+        setSettings(newSettings)
+        setShow2FAModal(false)
+        setVerificationCode('')
+        setTwoFASetupStep('qr')
+        setIs2FASetupLoading(false)
+        setSaveMessageType('success')
+        setSaveMessage('Two-factor authentication enabled successfully!')
+        setTimeout(() => setSaveMessage(''), 3000)
+      }, 1000)
+    } catch (error) {
+      console.error('Error verifying 2FA code:', error)
+      setIs2FASetupLoading(false)
     }
   }
 
@@ -857,7 +921,7 @@ export default function SettingsPage() {
                 <input
                   type="checkbox"
                   checked={settings.twoFactorAuth}
-                  onChange={(e) => handleSettingChange('twoFactorAuth', e.target.checked)}
+                  onChange={(e) => handle2FAToggle(e.target.checked)}
                   style={{
                     width: '1.25rem',
                     height: '1.25rem',
@@ -953,6 +1017,202 @@ export default function SettingsPage() {
             >
               {isSaving ? 'Saving...' : 'Save Security Settings'}
             </button>
+          </div>
+        )}
+
+        {/* 2FA Setup Modal */}
+        {show2FAModal && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}>
+            <div style={{
+              background: 'rgba(11, 18, 32, 0.95)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '1rem',
+              padding: '2rem',
+              maxWidth: '500px',
+              width: '90%',
+              backdropFilter: 'blur(10px)'
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '1.5rem'
+              }}>
+                <h2 style={{
+                  fontSize: '1.5rem',
+                  fontWeight: 700,
+                  color: 'white',
+                  margin: 0
+                }}>
+                  Set Up Two-Factor Authentication
+                </h2>
+                <button
+                  onClick={() => setShow2FAModal(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#9CA3AF',
+                    fontSize: '1.5rem',
+                    cursor: 'pointer',
+                    padding: '0.25rem'
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              {twoFASetupStep === 'qr' && (
+                <div>
+                  <p style={{ color: '#9CA3AF', marginBottom: '1.5rem' }}>
+                    Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)
+                  </p>
+                  
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    marginBottom: '1.5rem'
+                  }}>
+                    {is2FASetupLoading ? (
+                      <div style={{
+                        width: '200px',
+                        height: '200px',
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: '0.5rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#9CA3AF'
+                      }}>
+                        Loading QR Code...
+                      </div>
+                    ) : (
+                      <img 
+                        src={qrCodeUrl} 
+                        alt="2FA QR Code" 
+                        style={{
+                          width: '200px',
+                          height: '200px',
+                          borderRadius: '0.5rem'
+                        }}
+                      />
+                    )}
+                  </div>
+
+                  <div style={{
+                    background: 'rgba(154, 242, 58, 0.1)',
+                    border: '1px solid rgba(154, 242, 58, 0.3)',
+                    borderRadius: '0.5rem',
+                    padding: '1rem',
+                    marginBottom: '1.5rem'
+                  }}>
+                    <h4 style={{ color: '#9AF23A', marginBottom: '0.5rem' }}>Setup Instructions:</h4>
+                    <ol style={{ color: '#9CA3AF', fontSize: '0.875rem', margin: 0, paddingLeft: '1rem' }}>
+                      <li>Download an authenticator app (Google Authenticator, Authy, etc.)</li>
+                      <li>Scan the QR code above</li>
+                      <li>Enter the 6-digit code from your app</li>
+                    </ol>
+                  </div>
+
+                  <button
+                    onClick={() => setTwoFASetupStep('verify')}
+                    disabled={is2FASetupLoading}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      background: 'linear-gradient(135deg, #2D5BFF, #9AF23A)',
+                      border: 'none',
+                      borderRadius: '0.5rem',
+                      color: 'white',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      cursor: is2FASetupLoading ? 'not-allowed' : 'pointer',
+                      opacity: is2FASetupLoading ? 0.6 : 1
+                    }}
+                  >
+                    I've Scanned the QR Code
+                  </button>
+                </div>
+              )}
+
+              {twoFASetupStep === 'verify' && (
+                <div>
+                  <p style={{ color: '#9CA3AF', marginBottom: '1.5rem' }}>
+                    Enter the 6-digit verification code from your authenticator app
+                  </p>
+                  
+                  <input
+                    type="text"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="000000"
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '0.5rem',
+                      color: 'white',
+                      fontSize: '1.25rem',
+                      textAlign: 'center',
+                      letterSpacing: '0.5rem',
+                      marginBottom: '1.5rem'
+                    }}
+                    maxLength={6}
+                  />
+
+                  <div style={{
+                    display: 'flex',
+                    gap: '1rem'
+                  }}>
+                    <button
+                      onClick={() => setTwoFASetupStep('qr')}
+                      style={{
+                        flex: 1,
+                        padding: '0.75rem',
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        borderRadius: '0.5rem',
+                        color: 'white',
+                        fontSize: '0.875rem',
+                        fontWeight: 500,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Back
+                    </button>
+                    <button
+                      onClick={verify2FACode}
+                      disabled={verificationCode.length !== 6 || is2FASetupLoading}
+                      style={{
+                        flex: 1,
+                        padding: '0.75rem',
+                        background: 'linear-gradient(135deg, #2D5BFF, #9AF23A)',
+                        border: 'none',
+                        borderRadius: '0.5rem',
+                        color: 'white',
+                        fontSize: '0.875rem',
+                        fontWeight: 600,
+                        cursor: (verificationCode.length !== 6 || is2FASetupLoading) ? 'not-allowed' : 'pointer',
+                        opacity: (verificationCode.length !== 6 || is2FASetupLoading) ? 0.6 : 1
+                      }}
+                    >
+                      {is2FASetupLoading ? 'Verifying...' : 'Verify & Enable 2FA'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

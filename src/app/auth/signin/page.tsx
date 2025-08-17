@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 export default function SignInPage() {
   const [formData, setFormData] = useState({
@@ -12,9 +12,18 @@ export default function SignInPage() {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [inactivityMessage, setInactivityMessage] = useState('')
   
   const { signIn } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const reason = searchParams.get('reason')
+    if (reason === 'inactivity') {
+      setInactivityMessage('Your session expired due to inactivity. Please sign in again.')
+    }
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -74,6 +83,22 @@ export default function SignInPage() {
             color: '#9CA3AF'
           }}>Sign in to your Prop Shop AI account</p>
         </div>
+
+        {/* Inactivity Message */}
+        {inactivityMessage && (
+          <div style={{
+            padding: '0.75rem',
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '0.5rem',
+            color: '#FCA5A5',
+            marginBottom: '1.5rem',
+            fontSize: '0.875rem',
+            textAlign: 'center'
+          }}>
+            {inactivityMessage}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '1rem' }}>

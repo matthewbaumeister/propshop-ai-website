@@ -4,6 +4,7 @@ import "./globals.css"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { AuthProvider } from "@/contexts/AuthContext"
+import { InactivityTimer } from "@/components/InactivityTimer"
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -781,6 +782,7 @@ export default function RootLayout({
         <AuthProvider>
           <Header />
           {children}
+          <InactivityTimer />
         </AuthProvider>
         <Footer />
       </body>

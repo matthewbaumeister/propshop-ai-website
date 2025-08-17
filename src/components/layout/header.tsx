@@ -2,16 +2,36 @@
 
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 
 export function Header() {
   const { user, signOut, loading } = useAuth()
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const userMenuRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
 
   const handleSignOut = async () => {
     await signOut()
     setShowUserMenu(false)
   }
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false)
+      }
+    }
+
+    if (showUserMenu) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showUserMenu])
 
   // Show loading state while checking authentication
   if (loading) {
@@ -89,7 +109,7 @@ export function Header() {
           </Link>
           
           {user ? (
-            <div className="relative">
+            <div className="relative" ref={userMenuRef}>
               <button 
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="btn btn-ghost"

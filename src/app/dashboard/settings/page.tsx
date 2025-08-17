@@ -1047,6 +1047,7 @@ export default function SettingsPage() {
             {/* Delete Account Section */}
             <div style={{
               marginTop: '1.5rem',
+              marginBottom: '2rem',
               padding: '1.5rem',
               background: 'rgba(220, 38, 38, 0.1)',
               border: '1px solid rgba(220, 38, 38, 0.3)',

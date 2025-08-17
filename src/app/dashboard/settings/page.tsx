@@ -71,13 +71,74 @@ export default function SettingsPage() {
           'Authorization': `Bearer ${session.access_token}`
         }
       })
+      
       if (response.ok) {
         const data = await response.json()
         setProfile(data)
         setOriginalProfile(data) // Store original values for change detection
+      } else if (response.status === 403) {
+        // Profile might be marked as deleted, try to create a new one
+        console.log('Profile access denied, attempting to create new profile...')
+        await createNewProfile()
+      } else {
+        console.error('Failed to load profile:', response.status)
+        // Try to create a default profile
+        await createNewProfile()
       }
     } catch (error) {
       console.error('Error loading profile:', error)
+      // Try to create a default profile on error
+      await createNewProfile()
+    }
+  }
+
+  const createNewProfile = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user) return
+
+      // Create a new profile directly in the database
+      const { data: newProfile, error } = await supabase
+        .from('user_profiles')
+        .insert({
+          user_id: session.user.id,
+          first_name: session.user.user_metadata?.name || session.user.user_metadata?.full_name || session.user.email!.split('@')[0],
+          last_name: '',
+          company: '',
+          role: 'user',
+          phone: '',
+          bio: '',
+          theme_preference: 'dark',
+          email_notifications: true,
+          admin_notifications: false,
+          meeting_notifications: false
+        })
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Error creating new profile:', error)
+        // Set default profile data even if creation fails
+        const defaultProfile = {
+          first_name: session.user.user_metadata?.name || session.user.user_metadata?.full_name || session.user.email!.split('@')[0],
+          last_name: '',
+          company: '',
+          role: 'user',
+          phone: '',
+          bio: '',
+          theme_preference: 'dark' as const,
+          email_notifications: true,
+          admin_notifications: false,
+          meeting_notifications: false
+        }
+        setProfile(defaultProfile)
+        setOriginalProfile(defaultProfile)
+      } else {
+        setProfile(newProfile)
+        setOriginalProfile(newProfile)
+      }
+    } catch (error) {
+      console.error('Error in createNewProfile:', error)
     }
   }
 
@@ -104,27 +165,66 @@ export default function SettingsPage() {
           'Authorization': `Bearer ${session.access_token}`
         }
       })
+      
       if (response.ok) {
         const data = await response.json()
         setSettings(data)
         setOriginalSettings(data) // Store original values for change detection
+      } else if (response.status === 403) {
+        // Settings access denied, try to create default settings
+        console.log('Settings access denied, creating default settings...')
+        await createDefaultSettings()
       } else {
         console.error('Failed to load settings:', response.status)
         // Set default settings if none exist
-        const defaultSettings = {
-          emailNotifications: true,
-          pushNotifications: false,
-          marketingEmails: false,
-          twoFactorAuth: false,
-          language: 'en',
-          timezone: 'UTC'
-        }
-        setSettings(defaultSettings)
-        setOriginalSettings(defaultSettings)
+        await createDefaultSettings()
       }
     } catch (error) {
       console.error('Error loading settings:', error)
       // Set default settings on error
+      await createDefaultSettings()
+    }
+  }
+
+  const createDefaultSettings = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user) return
+
+      // Try to create default settings in the database
+      const { data: newSettings, error } = await supabase
+        .from('user_settings')
+        .insert({
+          user_id: session.user.id,
+          email_notifications: true,
+          push_notifications: false,
+          marketing_emails: false,
+          two_factor_auth: false,
+          language: 'en',
+          timezone: 'UTC',
+          theme_preference: 'dark'
+        })
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Error creating default settings:', error)
+      }
+
+      // Set default settings regardless of database creation success
+      const defaultSettings = {
+        emailNotifications: true,
+        pushNotifications: false,
+        marketingEmails: false,
+        twoFactorAuth: false,
+        language: 'en',
+        timezone: 'UTC'
+      }
+      setSettings(defaultSettings)
+      setOriginalSettings(defaultSettings)
+    } catch (error) {
+      console.error('Error in createDefaultSettings:', error)
+      // Set default settings even on error
       const defaultSettings = {
         emailNotifications: true,
         pushNotifications: false,
@@ -1021,6 +1121,82 @@ export default function SettingsPage() {
             }}>
               Security Settings
             </h2>
+            
+            {/* Email Verification Status */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '1.5rem',
+              background: emailVerified ? 'rgba(154, 242, 58, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+              borderRadius: '0.5rem',
+              border: `1px solid ${emailVerified ? 'rgba(154, 242, 58, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+              marginBottom: '1.5rem'
+            }}>
+              <div>
+                <h3 style={{ 
+                  color: emailVerified ? '#9AF23A' : '#FCA5A5', 
+                  marginBottom: '0.5rem', 
+                  fontSize: '1rem', 
+                  fontWeight: 600 
+                }}>
+                  Email Verification Status
+                </h3>
+                <p style={{ 
+                  color: emailVerified ? '#86EFAC' : '#FCA5A5', 
+                  fontSize: '0.875rem', 
+                  margin: 0 
+                }}>
+                  {emailVerified 
+                    ? 'Your email address has been verified and your account is fully active.' 
+                    : 'Please verify your email address to complete your account setup and access all features.'
+                  }
+                </p>
+              </div>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                <div style={{
+                  width: '20px',
+                  height: '20px',
+                  background: emailVerified ? '#9AF23A' : '#EF4444',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {emailVerified ? (
+                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <span style={{ color: 'white', fontSize: '10px', fontWeight: 'bold' }}>!</span>
+                  )}
+                </div>
+                {!emailVerified && (
+                  <button
+                    onClick={() => window.location.href = '/auth/verify-email'}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      background: '#EF4444',
+                      border: '1px solid rgba(239, 68, 68, 0.4)',
+                      borderRadius: '0.25rem',
+                      color: 'white',
+                      cursor: 'pointer',
+                      fontSize: '0.75rem',
+                      fontWeight: 500,
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = '#DC2626'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = '#EF4444'}
+                  >
+                    Verify Now
+                  </button>
+                )}
+              </div>
+            </div>
             
             <div style={{
               display: 'flex',

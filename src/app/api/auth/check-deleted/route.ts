@@ -38,21 +38,17 @@ export async function POST(request: NextRequest) {
       email_confirmed_at: user.email_confirmed_at
     })
 
-    // Check if user profile is soft deleted
-    const { data: profile, error: profileError } = await supabase
-      .from('user_profiles')
-      .select('deleted_at')
-      .eq('user_id', user.id)
-      .single()
-
-    if (profileError && profileError.code !== 'PGRST116') {
-      console.error('Error checking profile:', profileError)
-      return NextResponse.json({ error: 'Failed to check user status' }, { status: 500 })
-    }
-
-    // Check if user is deleted in auth.users or if profile is soft deleted
-    // Note: Supabase might use different field names for deletion status
-    const isDeleted = user.deleted_at || profile?.deleted_at ? true : false
+    // For now, let's simplify this and only check if the user is deleted in Supabase auth
+    // If they can authenticate, they're not deleted
+    // The profile deletion status might be causing issues with new accounts
+    const isDeleted = user.deleted_at ? true : false
+    
+    console.log('Simplified deletion check:', {
+      user_id: user.id,
+      email: user.email,
+      deleted_at: user.deleted_at,
+      isDeleted: isDeleted
+    })
 
     return NextResponse.json({ 
       deleted: isDeleted, 

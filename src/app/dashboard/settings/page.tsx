@@ -51,11 +51,13 @@ export default function SettingsPage() {
   const [is2FASetupLoading, setIs2FASetupLoading] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeletingAccount, setIsDeletingAccount] = useState(false)
+  const [emailVerified, setEmailVerified] = useState(false)
 
   useEffect(() => {
     if (user) {
       loadProfile()
       loadSettings()
+      checkEmailVerification()
     }
   }, [user])
 
@@ -76,6 +78,19 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error('Error loading profile:', error)
+    }
+  }
+
+  const checkEmailVerification = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user?.email_confirmed_at) {
+        setEmailVerified(true)
+      } else {
+        setEmailVerified(false)
+      }
+    } catch (error) {
+      console.error('Error checking email verification:', error)
     }
   }
 
@@ -500,6 +515,70 @@ export default function SettingsPage() {
             padding: '2rem',
             marginBottom: '2rem'
           }}>
+            {/* Email Verification Section */}
+            {!emailVerified && (
+              <div style={{
+                background: 'rgba(59, 130, 246, 0.1)',
+                border: '1px solid rgba(59, 130, 246, 0.3)',
+                borderRadius: '0.75rem',
+                padding: '1.5rem',
+                marginBottom: '2rem'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  marginBottom: '1rem'
+                }}>
+                  <div style={{
+                    width: '24px',
+                    height: '24px',
+                    background: '#3B82F6',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <span style={{ color: 'white', fontSize: '14px', fontWeight: 'bold' }}>!</span>
+                  </div>
+                  <h3 style={{
+                    fontSize: '1.125rem',
+                    fontWeight: 600,
+                    color: '#3B82F6',
+                    margin: 0
+                  }}>
+                    Complete Account Setup
+                  </h3>
+                </div>
+                <p style={{
+                  color: '#93C5FD',
+                  fontSize: '0.875rem',
+                  lineHeight: '1.5',
+                  marginBottom: '1rem'
+                }}>
+                  Please verify your email address to complete your account setup and access all features.
+                </p>
+                <button
+                  onClick={() => window.location.href = '/auth/verify-email'}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    background: '#3B82F6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    cursor: 'pointer',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    transition: 'background-color 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#2563EB'}
+                  onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#3B82F6'}
+                >
+                  Verify Email Now
+                </button>
+              </div>
+            )}
+
             <h2 style={{
               fontSize: '1.5rem',
               fontWeight: 700,

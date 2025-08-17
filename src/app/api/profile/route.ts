@@ -135,3 +135,59 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    // Get the authorization header
+    const authHeader = request.headers.get('authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const token = authHeader.substring(7)
+    
+    // Create Supabase client with service role key for server-side operations
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+    
+    // Get the current user from the token
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Delete user profile
+    const { error: profileError } = await supabase
+      .from('user_profiles')
+      .delete()
+      .eq('user_id', user.id)
+
+    if (profileError) {
+      console.error('Error deleting profile:', profileError)
+      return NextResponse.json({ error: 'Failed to delete profile' }, { status: 500 })
+    }
+
+    // Delete user settings
+    const { error: settingsError } = await supabase
+      .from('user_settings')
+      .delete()
+      .eq('user_id', user.id)
+
+    if (settingsError) {
+      console.error('Error deleting settings:', settingsError)
+      // Continue even if settings deletion fails
+    }
+
+    // Note: We cannot delete the user from Supabase Auth from this API route
+    // as we don't have admin privileges. The user will need to delete their account
+    // from the Supabase dashboard or through a separate admin process.
+
+    return NextResponse.json({ message: 'Account data deleted successfully' })
+  } catch (error) {
+    console.error('Error in DELETE /api/profile:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}

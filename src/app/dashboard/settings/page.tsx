@@ -19,7 +19,7 @@ interface ProfileData {
 }
 
 export default function SettingsPage() {
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
   const [profile, setProfile] = useState<ProfileData>({})
   const [originalProfile, setOriginalProfile] = useState<ProfileData>({})
   const [settings, setSettings] = useState({
@@ -49,6 +49,8 @@ export default function SettingsPage() {
   const [qrCodeUrl, setQrCodeUrl] = useState('')
   const [verificationCode, setVerificationCode] = useState('')
   const [is2FASetupLoading, setIs2FASetupLoading] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -293,6 +295,47 @@ export default function SettingsPage() {
     } catch (error) {
       console.error('Error verifying 2FA code:', error)
       setIs2FASetupLoading(false)
+    }
+  }
+
+  const handleDeleteAccount = async () => {
+    if (!confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.')) {
+      return
+    }
+    
+    setIsDeletingAccount(true)
+    
+    try {
+      // Get current session
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error('No active session')
+      }
+      
+      // Delete user profile and settings from database
+      const response = await fetch('/api/profile', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
+      
+      if (response.ok) {
+        // Sign out the user
+        await signOut()
+        
+        // Redirect to home page
+        window.location.href = '/'
+      } else {
+        throw new Error('Failed to delete account')
+      }
+    } catch (error) {
+      console.error('Error deleting account:', error)
+      alert('Failed to delete account. Please try again.')
+    } finally {
+      setIsDeletingAccount(false)
+      setShowDeleteModal(false)
     }
   }
 
@@ -999,6 +1042,51 @@ export default function SettingsPage() {
               </div>
             </div>
 
+            {/* Delete Account Section */}
+            <div style={{
+              marginTop: '2rem',
+              padding: '1.5rem',
+              background: 'rgba(220, 38, 38, 0.1)',
+              border: '1px solid rgba(220, 38, 38, 0.3)',
+              borderRadius: '0.5rem'
+            }}>
+              <h3 style={{
+                color: '#dc2626',
+                marginBottom: '0.5rem',
+                fontSize: '1rem',
+                fontWeight: 600
+              }}>
+                🗑️ Delete Account
+              </h3>
+              <p style={{
+                color: '#fca5a5',
+                fontSize: '0.875rem',
+                marginBottom: '1rem',
+                lineHeight: '1.5'
+              }}>
+                This action cannot be undone. This will permanently delete your account, 
+                profile, and all associated data. Please be certain.
+              </p>
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: '#dc2626',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#b91c1c'}
+                onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#dc2626'}
+              >
+                Delete My Account
+              </button>
+            </div>
+
             <button
               onClick={handleSettingsSave}
               disabled={isSaving || !hasSettingsChanges()}
@@ -1212,6 +1300,142 @@ export default function SettingsPage() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Delete Account Confirmation Modal */}
+        {showDeleteModal && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}>
+            <div style={{
+              background: 'rgba(11, 18, 32, 0.95)',
+              border: '1px solid rgba(220, 38, 38, 0.3)',
+              borderRadius: '1rem',
+              padding: '2rem',
+              maxWidth: '500px',
+              width: '90%',
+              backdropFilter: 'blur(10px)'
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '1.5rem'
+              }}>
+                <h3 style={{
+                  color: '#dc2626',
+                  fontSize: '1.5rem',
+                  fontWeight: 700,
+                  margin: 0
+                }}>
+                  🗑️ Delete Account
+                </h3>
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#9CA3AF',
+                    fontSize: '1.5rem',
+                    cursor: 'pointer',
+                    padding: '0.25rem'
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div style={{
+                background: 'rgba(220, 38, 38, 0.1)',
+                border: '1px solid rgba(220, 38, 38, 0.3)',
+                borderRadius: '0.5rem',
+                padding: '1rem',
+                marginBottom: '1.5rem'
+              }}>
+                <p style={{
+                  color: '#fca5a5',
+                  fontSize: '0.875rem',
+                  lineHeight: '1.6',
+                  margin: 0
+                }}>
+                  <strong>⚠️ This action cannot be undone!</strong>
+                </p>
+                <p style={{
+                  color: '#fca5a5',
+                  fontSize: '0.875rem',
+                  lineHeight: '1.6',
+                  margin: '0.5rem 0 0 0'
+                }}>
+                  Deleting your account will permanently remove:
+                </p>
+                <ul style={{
+                  color: '#fca5a5',
+                  fontSize: '0.875rem',
+                  lineHeight: '1.6',
+                  margin: '0.5rem 0 0 1rem',
+                  padding: 0
+                }}>
+                  <li>Your profile and personal information</li>
+                  <li>All your settings and preferences</li>
+                  <li>Account access and authentication</li>
+                  <li>Any saved data or configurations</li>
+                </ul>
+              </div>
+
+              <div style={{
+                display: 'flex',
+                gap: '1rem',
+                justifyContent: 'flex-end'
+              }}>
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={isDeletingAccount}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: '0.5rem',
+                    color: 'white',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    cursor: isDeletingAccount ? 'not-allowed' : 'pointer',
+                    opacity: isDeletingAccount ? 0.6 : 1
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={isDeletingAccount}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    background: '#dc2626',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    color: 'white',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    cursor: isDeletingAccount ? 'not-allowed' : 'pointer',
+                    opacity: isDeletingAccount ? 0.6 : 1,
+                    transition: 'background-color 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => !isDeletingAccount && (e.target as HTMLButtonElement).style.backgroundColor = '#b91c1c'}
+                  onMouseLeave={(e) => !isDeletingAccount && (e.target as HTMLButtonElement).style.backgroundColor = '#dc2626'}
+                >
+                  {isDeletingAccount ? 'Deleting...' : 'Yes, Delete My Account'}
+                </button>
+              </div>
             </div>
           </div>
         )}

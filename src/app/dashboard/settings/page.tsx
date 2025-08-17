@@ -1198,6 +1198,41 @@ export default function SettingsPage() {
               </div>
             </div>
             
+            {/* Change Password Section */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '1.5rem',
+              background: 'rgba(255, 255, 255, 0.05)',
+              borderRadius: '0.5rem',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              marginBottom: '1.5rem'
+            }}>
+              <div>
+                <h3 style={{ color: 'white', marginBottom: '0.5rem', fontSize: '1rem', fontWeight: 600 }}>Password</h3>
+                <p style={{ color: '#9CA3AF', fontSize: '0.875rem', margin: 0 }}>Change your account password for enhanced security</p>
+              </div>
+              <button
+                onClick={() => window.location.href = '/auth/forgot-password'}
+                style={{
+                  padding: '0.5rem 1rem',
+                  background: 'rgba(45, 91, 255, 0.2)',
+                  border: '1px solid rgba(45, 91, 255, 0.4)',
+                  borderRadius: '0.25rem',
+                  color: '#2D5BFF',
+                  cursor: 'pointer',
+                  fontSize: '0.75rem',
+                  fontWeight: 500,
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(45, 91, 255, 0.3)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(45, 91, 255, 0.2)'}
+              >
+                Change Password
+              </button>
+            </div>
+            
             <div style={{
               display: 'flex',
               flexDirection: 'column',

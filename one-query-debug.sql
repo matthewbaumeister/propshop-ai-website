@@ -4,10 +4,8 @@
 -- Since your SQL Editor can't handle complex queries, let's just run the fix directly
 
 -- Step 1: Drop the problematic triggers that reference the non-existent 'users' table
-DROP TRIGGER IF EXISTS create_admin_users_trigger ON users;
-DROP TRIGGER IF EXISTS create_user_profile_trigger ON users;
-DROP TRIGGER IF EXISTS on_auth_user_created ON users;
-DROP TRIGGER IF EXISTS on_auth_user_created_profile ON users;
+-- Note: These triggers don't exist on the 'users' table, so we'll just create the correct one
+-- The error confirms that the 'users' table doesn't exist, which is why signup was failing
 
 -- Step 2: Create the correct trigger on auth.users for profile creation
 CREATE OR REPLACE FUNCTION create_user_profile_on_signup()
